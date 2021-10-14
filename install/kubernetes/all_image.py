@@ -43,7 +43,8 @@ new_pipline = [
     'gcr.io/ml-pipeline/metadata-envoy:1.6.0',
     'gcr.io/ml-pipeline/metadata-writer:1.6.0',
     'gcr.io/tfx-oss-public/ml_metadata_store_server:0.30.0',
-    "gcr.io/ml-pipeline/argoexec:v2.7.5-license-compliance"
+    "gcr.io/ml-pipeline/argoexec:v2.7.5-license-compliance",
+    "gcr.io/ml-pipeline/argoexec:v2.12.9-license-compliance"
 ]
 
 
@@ -112,7 +113,7 @@ kube_batch = ['kubesigs/kube-batch:v0.5']
 
 
 images = new_katib + images + new_pipline + new_gpu + new_prometheus + new_serving + knative_sha256 + knative + volcano
-# images = new_pipline
+# images = kube_batch
 images = list(set(images))
 
 # 通过私有仓库，将公有镜像下发到内网每台机器上，例如内网ai.tencentmusic.com的仓库
