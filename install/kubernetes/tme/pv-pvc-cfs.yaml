@@ -1,0 +1,61 @@
+# venus 联动需要使用这个pvc
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pipeline-cfs-workspace
+  labels:
+    pipeline-pvname: pipeline-cfs-workspace
+spec:
+  capacity:
+    storage: 500T
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /data/cfs/kubeflow_cluster/kubeflow/pipeline/workspace
+  persistentVolumeReclaimPolicy: Retain
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: kubeflow-cfs-workspace
+  namespace: pipeline
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500T
+  selector:
+    matchLabels:
+      pipeline-pvname: pipeline-cfs-workspace
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pipeline-cfs-archives
+  labels:
+    pipeline-pvname: pipeline-cfs-archives
+spec:
+  capacity:
+    storage: 500T
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /data/cfs/kubeflow_cluster/kubeflow/pipeline/archives
+  persistentVolumeReclaimPolicy: Retain
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: kubeflow-cfs-archives
+  namespace: pipeline
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500T
+  selector:
+    matchLabels:
+      pipeline-pvname: pipeline-cfs-archives

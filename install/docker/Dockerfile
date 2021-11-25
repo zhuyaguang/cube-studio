@@ -1,4 +1,4 @@
-# docker build -t ai.tencentmusic.com/tme-public/kubeflow-dashboard:2021.10.01 -f install/docker/Dockerfile .
+# docker build -t ai.tencentmusic.com/tme-public/kubeflow-dashboard:tme-2021.10.01.17 -f install/docker/Dockerfile .
 
 FROM ai.tencentmusic.com/tme-public/kubeflow-dashboard:base
 
@@ -18,6 +18,11 @@ RUN pip install kubernetes==12.0.1
 COPY install/docker/docker-add-file/rest.py /usr/local/lib/python3.6/dist-packages/kubernetes/client/rest.py
 COPY install/docker/docker-add-file/__init__.py /usr/local/lib/python3.6/dist-packages/marshmallow_enum/__init__.py
 
+# 安装七彩石配置
+RUN pip install rainbow-admin -i https://mirrors.tencent.com/repository/pypi/tencent_pypi/simple --extra-index-url https://mirrors.tencent.com/pypi/simple/ --upgrade
+# 安装北极星的配置
+RUN pip install polaris-python --index-url https://mirrors.cloud.tencent.com/pypi/simple/  --extra-index-url https://mirrors.tencent.com/repository/pypi/tencent_pypi/simple/
+
 COPY myapp /home/myapp/myapp
 ENV PATH=/home/myapp/myapp/bin:$PATH
 ENV PYTHONPATH=/home/myapp:/kubeflow/src/pipelines/sdk/python/:/kubeflow/src/fairing/:/kubeflow/src/kfserving/python/kfserving/:/kubeflow/src/tf-operator/sdk/python/:/kubeflow/src/xgboost-operator/sdk/python/:/kubeflow/src/katib/sdk/python/v1alpha3/:$PYTHONPATH
@@ -27,6 +32,7 @@ COPY install/docker/entrypoint.sh /entrypoint.sh
 
 # ENTRYPOINT ["/entrypoint.sh"]
 # HEALTHCHECK CMD ["curl", "-f", "http://localhost:80/health"]
+
 
 
 

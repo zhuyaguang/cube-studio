@@ -1,0 +1,72 @@
+#include "ai_hello.jce"
+
+module ai{
+    const int kEFIndexModuleId = 298003280;
+    // TODO: Add ifcid;
+
+    enum E_EF_UPDATE_TYPE{
+
+    };
+
+    // ef索引创建、更新
+    // 暂定，看是调用脚本平台task还是通过某种方式执行
+    struct STUpdateEfIndexReq{
+        0 optional string project;          // 项目名 对应七彩石的group_name
+        1 optional string model_name;       // 模型名 对应emb_version json中的key
+        2 optional string version;          // 模型版本
+        3 optional string type;             // 索引更新类型
+        4 optional int index_id;            // 索引id
+        5 optional string date;             // 数据日期 可为空
+        // 待定 
+    };
+
+    struct STUpdateEfIndexRsp{
+        0 optional string taskid;              // 后续的逻辑和红石那边一样的，返回一个id，可以根据id查日志 可能需要这个id去查询索引更新状态
+    };
+    
+    // 获取embedding状况
+    struct STGetEmbStatsReq{
+        0 require string project;
+        1 require string model_name;
+        2 require string version; 
+        // 3 optional string taskid;                      // 不知道是用taskid还是上面的信息查询 就先这样吧
+    };
+
+    struct STGetEmbStatsRsp{
+        0 optional int code;                        // 返回码
+        1 optional string msg;                      // 错误信息
+        2 optional map<string, string> data;        // "status":"xxx"
+    };
+
+    // 删除索引接口
+    struct STRemoveModelEmbVersionReq{
+        0 require string project;
+        1 require string model_name;
+        2 require string version;
+        // 3 require string index;
+    };
+
+    struct STRemoveModelEmbVersionRsp{
+        0 optional bool success;
+    };
+
+    // 获取模型当前版本接口
+    struct STGetModelCurVersionReq{
+        0 require string project;
+        1 require string model_name;
+    };
+
+    struct STGetModelCurVersionRsp{
+        0 optional string version;
+        1 optional string errmsg;
+    };
+
+    interface EFIndexSvr {
+        int hello(SHelloReq req, out SHelloRsp rsp);
+        int updateIndex(STUpdateEfIndexReq req, out STUpdateEfIndexRsp rsp);
+        int checkEmbStats(STGetEmbStatsReq req, out STGetEmbStatsRsp rsp);
+        int removeModelEmb(STRemoveModelEmbVersionReq req, out STRemoveModelEmbVersionRsp rsp);
+        int getModelCurVer(STGetModelCurVersionReq req, out STGetModelCurVersionRsp rsp);
+        // int updateEfRedstoneConf(STUpdateEfRadStoneConfReq req, out STUpdateEfRadStoneConfRsp rsp);
+    };
+};

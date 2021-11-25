@@ -276,6 +276,15 @@ class MyappSecurityManager(SecurityManager):
     @staticmethod
     def before_request():
         g.user = current_user
+        # from flask_login.mixins import AnonymousUserMixin
+
+        # if not g.user or not g.user.get_id():
+        #     raise Exception('AnonymousUserMixin')
+        #     return redirect('/')
+
+
+        # if not g.user or g.user.is_anonymous:
+        #
         # if len(request.path)>7 and request.path[:7]!='/static' and g.user and hasattr(g.user, 'username'):
         #     logging.info('------------%s(%s):%s'%(request.method,g.user.username,request.path))
 
@@ -450,7 +459,7 @@ class MyappSecurityManager(SecurityManager):
 
             try:
                 from myapp.models.model_team import Project_User, Project
-                public_project = self.get_session.query(Project).filter(Project.name == "public").first()
+                public_project = self.get_session.query(Project).filter(Project.name == "public").filter(Project.type == "org").first()
                 if public_project:
                     project_user = Project_User()
                     project_user.project = public_project
@@ -711,8 +720,8 @@ class MyappSecurityManager(SecurityManager):
         return pvm.permission.name in {"can_override_role_permissions", "can_approve"}
 
 
-    # 创建视图，创建权限，创建视图-权限绑定记录。在sql-lab explore时使用。在插入，更新表格也会调用此函数
-    def set_perm(self, mapper, connection, target,permission_name='datasource_access'):  # noqa
+    # 创建视图，创建权限，创建视图-权限绑定记录。
+    def set_perm(self, mapper, connection, target,permission_name):  # noqa
         #
         # connection is sql
         # target is tables/db  model

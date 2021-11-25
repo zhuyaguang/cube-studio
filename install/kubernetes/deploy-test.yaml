@@ -1,0 +1,151 @@
+# 复制代码
+# kubectl cp myapp/views  -n infra kubeflow-dashboard-test:/home/myapp/myapp/
+# 本地代理
+# kubectl port-forward -n infra kubeflow-dashboard-test 8080:80
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubeflow-dashboard-test
+  namespace: infra
+  labels:
+    app: kubeflow-dashboard-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubeflow-dashboard-test
+  template:
+    metadata:
+      name: kubeflow-dashboard-test
+      labels:
+        app: kubeflow-dashboard-test
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubeflow-dashboard
+                operator: In
+                values:
+                - "true"
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+        - name: kubeflow-dashboard-config
+          configMap:
+            name: kubeflow-dashboard-config
+            items:
+              - key: entrypoint.sh
+                path: entrypoint.sh
+              - key: config.py
+                path: config.py
+        - name: kubernetes-config
+          configMap:
+            name: kubernetes-config
+        - name: kubeflow-global
+          persistentVolumeClaim:
+            claimName: kubeflow-global-pvc
+        - name: infra-kubeflow
+          persistentVolumeClaim:
+            claimName: infra-kubeflow
+      # hostNetwork: true   # 使用主机网络，要保障本机l5可用
+      hostAliases:
+      - ip: "10.123.119.83"
+        hostnames:
+        - "login.oa.com"
+      - ip: "10.14.83.153"
+        hostnames:
+        - "passport.oa.com"
+
+      imagePullSecrets:
+      - name: csig-hubsecret
+      serviceAccount: kubeflow-dashboard
+      containers:
+        - name: kubeflow-dashboard-test
+          image: csighub.tencentyun.com/tme-kubeflow/kubeflow-dashboard:2020.09.01.4
+          imagePullPolicy: Always  # IfNotPresent
+          command: ["bash","/entrypoint.sh"]    # 如果修改了entrypoint要使用命令执行
+#          command: ["sleep","300000"]
+          env:
+          - name: STAGE
+            value: dev
+          - name: REDIS_HOST
+            value: 'redis-master.infra'  #  'http://myapp.music.oa.com/login/'  'http://9.80.64.168/login/'
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_PASSWORD
+            value: 'admin'
+          - name: OA_LOGIN_URL
+            value: 'http://kubeflow.music.woa.com:443/login/'
+          - name: MYSQL_SERVICE
+#            value: "mysql+pymysql://root:admin@mysql-service.infra:3306/kubeflow?charset=utf8"
+            value: "mysql+pymysql://kubeflow:kubeflow@100.65.127.241:13326/kubeflow?charset=utf8"
+
+          volumeMounts:
+            - name: kubeflow-dashboard-config
+              mountPath: /entrypoint.sh
+              subPath: entrypoint.sh
+            - name: kubeflow-dashboard-config
+              mountPath: /home/myapp/myapp/config.py
+              subPath: config.py
+            - name: kubernetes-config
+              mountPath: /home/myapp/kubeconfig
+            - name: tz-config
+              mountPath: /etc/localtime
+            - name: kubeflow-global
+              mountPath: /pvc
+            - name: infra-kubeflow
+              mountPath: /data/k8s/kubeflow/
+
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 10
+              memory: 10Gi
+            requests:
+              cpu: 1
+              memory: 1Gi
+#          livenessProbe:
+#            failureThreshold: 2
+#            httpGet:
+#              path: /login?rtx_user=pengluan
+#              port: http
+#            initialDelaySeconds: 100
+#            periodSeconds: 60
+#            timeoutSeconds: 10
+          # readinessProbe:
+          #   failureThreshold: 2
+          #   httpGet:
+          #     path: /health
+          #     port: http
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 10
+          #   timeoutSeconds: 5
+
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubeflow-dashboard-test
+  namespace: infra
+  labels:
+    app: kubeflow-dashboard-test
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    app: kubeflow-dashboard-test
+  externalIPs:
+    -  10.101.134.200

@@ -1,0 +1,104 @@
+apiVersion: v1
+data:
+  abac-authz-policy.jsonl: "{\"apiVersion\": \"abac.authorization.kubernetes.io/v1beta1\",
+    \"kind\": \"Policy\", \"spec\": {\"user\":\"admin\", \"namespace\": \"*\", \"resource\":
+    \"*\", \"apiGroup\": \"*\", \"nonResourcePath\": \"*\"}}\n\t\t{\"apiVersion\":
+    \"abac.authorization.kubernetes.io/v1beta1\", \"kind\": \"Policy\", \"spec\":
+    {\"user\":\"kubelet\", \"namespace\": \"*\", \"resource\": \"*\", \"apiGroup\":
+    \"*\", \"nonResourcePath\": \"*\"}}\n\t\t{\"apiVersion\": \"abac.authorization.kubernetes.io/v1beta1\",
+    \"kind\": \"Policy\", \"spec\": {\"user\":\"kube_proxy\", \"namespace\": \"*\",
+    \"resource\": \"*\", \"apiGroup\": \"*\", \"nonResourcePath\": \"*\"}}\n\t\t{\"apiVersion\":
+    \"abac.authorization.kubernetes.io/v1beta1\", \"kind\": \"Policy\", \"spec\":
+    {\"user\":\"kubecfg\", \"namespace\": \"*\", \"resource\": \"*\", \"apiGroup\":
+    \"*\", \"nonResourcePath\": \"*\"}}\n\t\t{\"apiVersion\": \"abac.authorization.kubernetes.io/v1beta1\",
+    \"kind\": \"Policy\", \"spec\": {\"user\":\"client\", \"namespace\": \"*\", \"resource\":
+    \"*\", \"apiGroup\": \"*\", \"nonResourcePath\": \"*\"}}\n\t\t{\"apiVersion\":
+    \"abac.authorization.kubernetes.io/v1beta1\", \"kind\": \"Policy\", \"spec\":
+    {\"group\":\"system:serviceaccounts\", \"namespace\": \"*\", \"resource\": \"*\",
+    \"apiGroup\": \"*\", \"nonResourcePath\": \"*\"}}"
+  audit-policy.yaml: |
+    apiVersion: audit.k8s.io/v1
+    kind: Policy
+    omitStages:
+      - "RequestReceived"
+    rules:
+      - level: None
+        users: ["system:kube-proxy"]
+        verbs: ["watch"]
+        resources:
+          - group: ""
+            resources: ["endpoints", "services"]
+      - level: None
+        users: ["system:unsecured"]
+        namespaces: ["kube-system"]
+        verbs: ["get"]
+        resources:
+          - group: ""
+            resources: ["configmaps"]
+      - level: None
+        users: ["kubelet"]
+        verbs: ["get"]
+        resources:
+          - group: ""
+            resources: ["nodes"]
+      - level: None
+        userGroups: ["system:nodes"]
+        verbs: ["get"]
+        resources:
+          - group: ""
+            resources: ["nodes"]
+      - level: None
+        users:
+          - system:kube-controller-manager
+          - system:kube-scheduler
+          - system:serviceaccount:kube-system:endpoint-controller
+        verbs: ["get", "update"]
+        namespaces: ["kube-system"]
+        resources:
+          - group: ""
+            resources: ["endpoints"]
+      - level: None
+        users: ["system:apiserver"]
+        verbs: ["get"]
+        resources:
+          - group: ""
+            resources: ["namespaces"]
+      - level: None
+        nonResourceURLs:
+          - /healthz*
+          - /version
+          - /swagger*
+      - level: None
+        resources:
+          - group: ""
+            resources: ["events"]
+      - level: Metadata
+        resources:
+          - group: ""
+            resources: ["secrets", "configmaps"]
+          - group: authentication.k8s.io
+            resources: ["tokenreviews"]
+      # Get repsonses can be large; skip them.
+      - level: Request
+        verbs: ["get", "list", "watch"]
+      # Default level
+      - level: RequestResponse
+  basic_auth.csv: 8T2IXxpKPFgT243n8jnsksDFaj3AiXjt,admin,admin,system:masters
+  known_tokens.csv: |-
+    8T2IXxpKPFgT243n8jnsksDFaj3AiXjt,admin,admin,system:masters
+    zIXULiA8wJci3AA9vFcoKqYbJBdyXD1D,kubelet,kubelet,system:masters
+    G19A4CCqiFJVL4Psek7fvboTRr8gYFjp,system:kube-proxy,kube_proxy
+  qcloud.conf: '{"region":"gz","regionName":"ap-guangzhou","zone":"","vpcID":"vpc-clj4yc8f","QCloudSecretId":"","QCloudSecretKey":"","nodeNameType":"lan-ip"}'
+  scheduler-policy-config.json: '{"kind":"Policy","apiVersion":"v1","extenders":[{"urlPrefix":"http://cls-g9v4gmm0-apiserver-service:60001/api/v1/namespaces/kube-system/services/gpu-quota-admission/proxy/scheduler","apiVersion":"v1beta1","filterVerb":"predicates","managedResources":[{"name":"tencent.com/vcuda-core"}]}],"alwaysCheckAllPredicates":false}'
+kind: ConfigMap
+metadata:
+  annotations:
+    AdminPasswd: 8T2IXxpKPFgT243n8jnsksDFaj3AiXjt
+    KubeProxyPasswd: G19A4CCqiFJVL4Psek7fvboTRr8gYFjp
+    KubeletPasswd: zIXULiA8wJci3AA9vFcoKqYbJBdyXD1D
+  creationTimestamp: 2021-03-09T08:17:13Z
+  name: cls-g9v4gmm0-extra-config
+  namespace: cls-g9v4gmm0
+  resourceVersion: "42722454811"
+  selfLink: /api/v1/namespaces/cls-g9v4gmm0/configmaps/cls-g9v4gmm0-extra-config
+  uid: da8d2f28-80af-11eb-89ca-5254005876b8

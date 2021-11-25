@@ -92,9 +92,9 @@ class Pipeline_Filter(MyappFilter):
 class Service_ModelView(MyappModelView):
     datamodel = SQLAInterface(Service)
     help_url = conf.get('HELP_URL', {}).get(datamodel.obj.__tablename__, '') if datamodel else ''
-    show_columns = ['name', 'label','images','volume_mount','working_dir','command','env','node_selector','resource_memory','resource_cpu','resource_gpu','min_replicas','max_replicas','ports','host_url','link']
-    add_columns = ['project','name', 'label','images', 'volume_mount','working_dir','command','env','node_selector','resource_memory','resource_cpu','resource_gpu','min_replicas','max_replicas','ports','host']
-    list_columns = ['project','name_url','host_url','deploy','clear','creator','modified']
+    show_columns = ['name', 'label','images','volume_mount','working_dir','command','env','resource_memory','resource_cpu','resource_gpu','min_replicas','max_replicas','ports','host_url','link']
+    add_columns = ['project','name', 'label','images','working_dir','command','env','resource_memory','resource_cpu','resource_gpu','min_replicas','max_replicas','ports','host']
+    list_columns = ['project','name_url','host_url','polaris_url','deploy','clear','monitoring_url','creator','modified']
     edit_columns = add_columns
     base_order = ('id','desc')
     order_columns = ['id']
@@ -116,8 +116,8 @@ class Service_ModelView(MyappModelView):
         "working_dir": StringField(_(datamodel.obj.lab('working_dir')),description='工作目录，容器启动的初始所在目录，不填默认使用Dockerfile内定义的工作目录',widget=BS3TextFieldWidget()),
         "command":StringField(_(datamodel.obj.lab('command')), description='启动命令，支持多行命令',widget=MyBS3TextAreaFieldWidget(rows=3)),
         "node_selector":StringField(_(datamodel.obj.lab('node_selector')), description='运行当前服务所在的机器',widget=BS3TextFieldWidget(),default='cpu=true,serving=true'),
-        "resource_memory":StringField(_(datamodel.obj.lab('resource_memory')),default=Service.resource_memory.default.arg,description='内存的资源使用限制，示例1G，10G， 最大10G，如需更多联系管路员',widget=BS3TextFieldWidget(),validators=[DataRequired()]),
-        "resource_cpu":StringField(_(datamodel.obj.lab('resource_cpu')), default=Service.resource_cpu.default.arg,description='cpu的资源使用限制(单位核)，示例 0.4，10，最大10核，如需更多联系管路员',widget=BS3TextFieldWidget(), validators=[DataRequired()]),
+        "resource_memory":StringField(_(datamodel.obj.lab('resource_memory')),default=Service.resource_memory.default.arg,description='内存的资源使用限制，示例1G，10G， 最大100G，如需更多联系管路员',widget=BS3TextFieldWidget(),validators=[DataRequired()]),
+        "resource_cpu":StringField(_(datamodel.obj.lab('resource_cpu')), default=Service.resource_cpu.default.arg,description='cpu的资源使用限制(单位核)，示例 0.4，10，最大50核，如需更多联系管路员',widget=BS3TextFieldWidget(), validators=[DataRequired()]),
         "min_replicas": StringField(_(datamodel.obj.lab('min_replicas')), default=Service.min_replicas.default.arg,description='最小副本数，用来配置高可用，流量变动自动伸缩',widget=BS3TextFieldWidget(), validators=[DataRequired()]),
         "max_replicas": StringField(_(datamodel.obj.lab('max_replicas')), default=Service.max_replicas.default.arg,
                                     description='最大副本数，用来配置高可用，流量变动自动伸缩', widget=BS3TextFieldWidget(),
@@ -142,17 +142,75 @@ class Service_ModelView(MyappModelView):
 
     add_form_extra_fields = edit_form_extra_fields
 
+
+    def pre_add(self, item):
+        if not item.volume_mount:
+            item.volume_mount=item.project.volume_mount
+
+
     @expose('/clear/<service_id>', methods=['POST', "GET"])
     def clear(self, service_id):
         service = db.session.query(Service).filter_by(id=service_id).first()
+        service_external_name = (service.name + "-external")[:60]
+        service_external_name = service_external_name[:-1] if service_external_name[-1] == '-' else service_external_name
         from myapp.utils.py.py_k8s import K8s
         k8s = K8s(service.project.cluster['KUBECONFIG'])
         namespace = conf.get('SERVICE_NAMESPACE')
         k8s.delete_deployment(namespace=namespace,name=service.name)
         k8s.delete_service(namespace=namespace,name=service.name)
+        k8s.delete_service(namespace=namespace, name=service_external_name)
         k8s.delete_istio_ingress(namespace=namespace,name=service.name)
         flash('服务清理完成', category='warning')
         return redirect('/service_modelview/list/')
+
+    @pysnooper.snoop()
+    def create_polaris(self,service):
+        try:
+            from myapp.utils.py.py_polaris import Polaris
+            polaris = Polaris()
+
+            alias_token = json.loads(service.expand).get('alias_token','') if service.expand else ''
+            alias_l5 = json.loads(service.expand).get('alias_l5','') if service.expand else ''   # 只创建一次
+            service_name = '%s.service' % (service.name)
+            username = service.created_by.username + "," + conf.get('ADMIN_USER')
+
+            if not alias_l5:
+
+                alias = polaris.get_alias(service_name)
+                if len(alias)>0 and alias[0]['alias']!=alias_l5:
+                    flash('创建失败，存在系统无法识别的北极星别名，请先联系管理员手动处理','warning')
+                    return
+
+                polaris.delete_instances(service_name)
+                polaris.delete_alias(service_name,alias_token)
+                polaris.delete_service(service_name)
+                polaris_service = polaris.register_service(username, service_name)
+                print(polaris_service)
+                service_token = polaris_service['token'] if polaris_service else ''
+
+                alias = polaris.register_alias(username, service_name)
+
+                expand = json.loads(service.expand) if service.expand else {}
+                expand.update(
+                    {
+                        "service_token": service_token,
+                        "alias_token": alias['service_token'],
+                        "alias_l5": alias['alias'],
+                    }
+                )
+                service.expand = json.dumps(expand, indent=4, ensure_ascii=False)
+                db.session.commit()
+
+
+            polaris.delete_instances(service_name)
+            instances = polaris.register_instances(service_name,conf.get('SERVICE_EXTERNAL_IP'),30000+10*service.id)
+            print(instances)
+
+
+        except Exception as e:
+            print(e)
+            flash('部署北极星失败:%s'%str(e),'warning')
+
 
     @expose('/deploy/<service_id>',methods=['POST',"GET"])
     def deploy(self,service_id):
@@ -165,23 +223,14 @@ class Service_ModelView(MyappModelView):
 
         service = db.session.query(Service).filter_by(id=service_id).first()
         from myapp.utils.py.py_k8s import K8s
-        k8s = K8s(service.project.cluster['KUBECONFIG'])
+        k8s_client = K8s(service.project.cluster['KUBECONFIG'])
         namespace = conf.get('SERVICE_NAMESPACE')
-
-
-        # 设定service的机器选择器
-        if core.get_gpu(service.resource_gpu)[0]:
-            service.node_selector = service.node_selector.replace('cpu=true','gpu=true')
-            db.session.commit()
-        else:
-            service.node_selector = service.node_selector.replace('gpu=true', 'cpu=true')
-            db.session.commit()
 
         volume_mount = service.volume_mount
 
-        k8s.create_deployment(namespace=namespace,
+        k8s_client.create_deployment(namespace=namespace,
                               name=service.name,
-                              replicas=service.min_replicas,
+                              replicas=service.max_replicas,
                               labels={"app":service.name,"username":service.created_by.username},
                               command=['sh','-c',service.command] if service.command else None,
                               args=None,
@@ -205,7 +254,7 @@ class Service_ModelView(MyappModelView):
 
         ports = [int(port) for port in service.ports.split(',')]
 
-        k8s.create_service(
+        k8s_client.create_service(
             namespace=namespace,
             name=service.name,
             username=service.created_by.username,
@@ -215,7 +264,9 @@ class Service_ModelView(MyappModelView):
         host = service.name+"."+conf.get('SERVICE_DOMAIN')
         if service.host:
             host=service.host.replace('http://','').replace('https://','').strip()
-        k8s.create_istio_ingress(namespace=namespace,
+            if "/" in host:
+                host = host[:host.index("/")]
+        k8s_client.create_istio_ingress(namespace=namespace,
                            name=service.name,
                            host = host,
                            ports=service.ports.split(',')
@@ -225,15 +276,17 @@ class Service_ModelView(MyappModelView):
         SERVICE_EXTERNAL_IP = conf.get('SERVICE_EXTERNAL_IP',None)
         if SERVICE_EXTERNAL_IP:
             service_ports = [[30000+10*service.id+index,port] for index,port in enumerate(ports)]
-
-            k8s.create_service(
+            service_external_name = (service.name + "-external")[:60]
+            service_external_name = service_external_name[:-1] if service_external_name[-1] == '-' else service_external_name
+            k8s_client.create_service(
                 namespace=namespace,
-                name=(service.name+"-external")[:60],
+                name=service_external_name,
                 username=service.created_by.username,
                 ports=service_ports,
                 selector={"app": service.name, 'user': service.created_by.username},
                 externalIPs=conf.get('SERVICE_EXTERNAL_IP',None)
             )
+            self.create_polaris(service)
 
 
         # # 创建虚拟服务做代理
@@ -289,6 +342,16 @@ class Service_ModelView(MyappModelView):
         # # print(crd_json)
         # crd = k8s.create_crd(group=crd_info['group'], version=crd_info['version'], plural=crd_info['plural'],namespace=namespace, body=crd_json)
         # # return crd
+        if int(service.max_replicas)>int(service.min_replicas):
+            k8s_client.create_hpa(
+                namespace=namespace,
+                name=service.name,
+                min_replicas=int(service.min_replicas),
+                max_replicas=int(service.max_replicas),
+                mem_threshold=0.5,
+                cpu_threshold=0.5
+            )
+
 
         flash('服务部署完成',category='warning')
         return redirect('/service_modelview/list/')

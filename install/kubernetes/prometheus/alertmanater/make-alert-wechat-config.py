@@ -15,7 +15,7 @@ route:
   routes:
   - match_re:
       namespace: ".*"
-    receiver: 'default'
+    receiver: 'pengluan'
 
 # 告警抑制。避免重复告警的。
 # https://yunlzheng.gitbook.io/prometheus-book/parti-prometheus-ji-chu/alert/alert-manager-inhibit
@@ -28,10 +28,10 @@ inhibit_rules:
   equal: ['alertname', 'cluster', 'service']
 receivers:
 
-- name: 'default'
+- name: 'pengluan'
   webhook_configs:
   - send_resolved: true
-    url: 'http://xx.xx.xx.xx/'
+    url: 'http://swallow.music.woa.com/di/api-center/push?key=panther-alertmanager'
 
 - name: 'null'
 '''

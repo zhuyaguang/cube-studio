@@ -9,9 +9,9 @@ services:
       - "6379:6379"
 
   myapp:
-    image: ai.tencentmusic.com/tme-public/kubeflow-dashboard:2021.10.01
-    restart: on-failure   # on-failure  unless-stopped
-    command: ['bash','-c','/entrypoint.sh']   # 生产模式
+    image: ai.tencentmusic.com/tme-public/kubeflow-dashboard:tme-2021.10.01.7
+    restart: unless-stopped
+    command: ['bash','-c','sleep 10000000 && /entrypoint.sh']   # 生产模式
     environment:
       STAGE: 'dev'
       REDIS_HOST: 'host.docker.internal'
@@ -32,13 +32,29 @@ services:
       - ./entrypoint.sh:/entrypoint.sh
       - ./config.py:/home/myapp/myapp/config.py
       - ./kubeconfig:/home/myapp/kubeconfig
+#      - /Users/pengluan/data-master/kubeflow/src/pipelines/sdk/python/:/kubeflow/src/pipelines/sdk/python/
+#      - /Users/pengluan/data-master/kubeflow/src/fairing/:/kubeflow/src/fairing/
+#      - /Users/pengluan/data-master/kubeflow/src/xgboost-operator/sdk/python/:/kubeflow/src/xgboost-operator/sdk/python/
+#      - /Users/pengluan/data-master/kubeflow/src/kfserving/python/kfserving/:/kubeflow/src/kfserving/python/kfserving/
+#      - /Users/pengluan/data-master/kubeflow/src/tf-operator/sdk/python/:/kubeflow/src/tf-operator/sdk/python/
+#      - /Users/pengluan/data-master/kubeflow/src/katib/sdk/python/v1alpha3/:/kubeflow/src/katib/sdk/python/v1alpha3/
+#      - /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/flask/:/usr/local/lib/python3.6/dist-packages/flask/
+#      - /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/flask_appbuilder/:/usr/local/lib/python3.6/dist-packages/flask_appbuilder/
+#      - /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/sqlalchemy/:/usr/local/lib/python3.6/dist-packages/sqlalchemy/
+#      - /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/wtforms/:/usr/local/lib/python3.6/dist-packages/wtforms/
+#      - /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/flask_wtf/:/usr/local/lib/python3.6/dist-packages/flask_wtf/
+#      - /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/kubernetes/:/usr/local/lib/python3.6/dist-packages/kubernetes/
+#      - /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/marshmallow_sqlalchemy/:/usr/local/lib/python3.6/dist-packages/marshmallow_sqlalchemy/
+#      - /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/marshmallow/:/usr/local/lib/python3.6/dist-packages/marshmallow/
+#      - /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/marshmallow_enum/:/usr/local/lib/python3.6/dist-packages/marshmallow_enum/
 
 
 
+#
 #  beat:
-#    image: ai.tencentmusic.com/tme-public/kubeflow-dashboard:2021.10.01
+#    image: ai.tencentmusic.com/tme-public/kubeflow-dashboard:tme-2021.10.01.7
 #    restart: "no"
-#    command: ["bash","-c","celery beat --app=myapp.tasks.celery_app:celery_app --loglevel=info"]
+#    command: ["bash","-c","sleep 100000000 && celery beat --app=myapp.tasks.celery_app:celery_app --loglevel=info"]
 #    shm_size: '100gb'
 #    environment:
 #      REDIS_HOST: 'host.docker.internal'
@@ -59,9 +75,9 @@ services:
 ##
 #
 #  worker:
-#    image: ai.tencentmusic.com/tme-public/kubeflow-dashboard:2021.10.01
+#    image: ai.tencentmusic.com/tme-public/kubeflow-dashboard:tme-2021.10.01.7
 #    restart: unless-stopped
-#    command: ["bash","-c","celery worker --app=myapp.tasks.celery_app:celery_app --loglevel=info --pool=prefork -Ofair -c 4"]
+#    command: ["bash","-c","sleep 100000000 && celery worker --app=myapp.tasks.celery_app:celery_app --loglevel=info --pool=prefork -Ofair -c 40"]
 #    environment:
 #      REDIS_HOST: 'host.docker.internal'
 #      REDIS_PORT: '6379'
@@ -76,6 +92,6 @@ services:
 #      - ./entrypoint.sh:/entrypoint.sh
 #      - ./config.py:/home/myapp/myapp/config.py
 #      - ./kubeconfig:/home/myapp/kubeconfig
-#
+
 
 

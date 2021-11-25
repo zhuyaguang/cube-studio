@@ -1,0 +1,78 @@
+/**
+ * QQ音乐推荐架构组  TF排序服务
+ * @meiyangchen
+ */
+
+module recRanking
+{
+
+  struct FeatureData {
+    0 optional vector<float> float32s;
+    1 optional vector<string> strings;
+    2 optional vector<int> int32s;
+    3 optional vector<long> int64s;
+    4 optional vector<double> float64s;
+  };
+
+  struct FeatureKV {
+    0 require string featureK;
+    1 require FeatureData featureV;
+  };
+
+  struct RankingReq
+  {
+    0 require string modelName;  //模型名称
+    1 require map<long,vector<FeatureKV>>  itemFeatures;    //必填  物品特征
+    2 optional vector<FeatureKV> userFeatures;  //选填   用户特征
+  };
+
+  struct RespKV {
+    0 require string respK;
+    1 require FeatureData respV;
+  };
+
+  struct Resp {
+    0 require long itemId;
+    1 require vector<RespKV> respKVs;
+  };
+
+  struct RankingRsp
+  {
+    0 optional vector<Resp> result;
+  };
+
+  struct RankingFloatReq
+  {
+    0 require string modelName;
+	  1 require vector<vector<float>> itemFeatures;
+  };
+
+  struct RankingFloatRsp
+  {
+	  0 optional vector<vector<float>> result;  //支持多输出
+  };
+
+  struct ModelDetailReq
+  {
+    0 require string modelName;
+  };
+
+  struct ModelDetailRsp {
+    0 require string modelName;
+    1 require string onlineVersion; //该模型当前正在使用的版本
+    2 require vector<string> allVersions; //该模型当前已经被加载进入内存的所有版本
+  };
+
+  interface RecRankingSvr
+  {
+	  int Predict(RankingReq req, out RankingRsp rsp);  //特征字段映射预测接口
+    int PredictByFloat(RankingFloatReq req, out RankingFloatRsp rsp);   //float型特征值平铺预测接口
+    int GetModelDetail(ModelDetailReq req,out ModelDetailRsp rsp);  //获取模型的当前详情信息
+  };
+};
+
+
+
+
+
+

@@ -20,7 +20,7 @@ data:
       # Disabling symbolic-links is recommended to prevent assorted security risks
       symbolic-links=0
       bind-address    = 0.0.0.0
-      max_connections = 1000
+      max_connections = 10000
       innodb_buffer_pool_size=2G
       explicit_defaults_for_timestamp = 1
       character_set_server=utf8
@@ -28,5 +28,5 @@ data:
       default-character-set=utf8
       # skip-grant-tables
 
-  [client]
-    default-character-set=utf8
+    [client]
+      default-character-set=utf8

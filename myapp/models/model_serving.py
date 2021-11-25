@@ -70,6 +70,14 @@ class Service(Model,AuditMixinNullable,MyappModelBase):
         return Markup(f'<a href="/service_modelview/clear/{self.id}">清理</a>')
 
     @property
+    def monitoring_url(self):
+        # return Markup(f'<a href="/service_modelview/clear/{self.id}">清理</a>')
+        url=self.project.cluster.get('GRAFANA_SERVICE','')+self.name
+        return Markup(f'<a href="{url}">监控</a>')
+        # https://www.angularjswiki.com/fontawesome/fa-flask/    <i class="fa-solid fa-monitor-waveform"></i>
+
+
+    @property
     def name_url(self):
         # user_roles = [role.name.lower() for role in list(g.user.roles)]
         # if "admin" in user_roles:
@@ -93,6 +101,17 @@ class Service(Model,AuditMixinNullable,MyappModelBase):
     def get_node_selector(self):
         return self.get_default_node_selector(self.project.node_selector,self.resource_gpu,'service')
 
+
+    @property
+    def polaris_url(self):
+
+        l5=json.loads(self.expand).get('alias_l5','') if self.expand else ''
+        if l5:
+            url = "http://v2.polaris.oa.com/#/services/alias?alias=%s&owner=%s&namespace=Production"%(l5,self.created_by.username)
+        else:
+            url='http://v2.polaris.oa.com/#/services/alias'
+
+        return Markup(f'<a target=_blank href="{url}">{l5}</a>')
 
 
     @property

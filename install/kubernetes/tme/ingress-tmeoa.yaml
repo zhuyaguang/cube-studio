@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kubeflow-kubeflow-dashboard-cube
+  namespace: istio-system
+spec:
+  rules:
+    - host: cube-studio.tmeoa.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: istio-ingressgateway
+              servicePort: 80
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: infra-kubeflow-dashboard-data
+  namespace: infra
+spec:
+  rules:
+    - host: data.tmeoa.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: kubeflow-dashboard
+              servicePort: 80
+
+

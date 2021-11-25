@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 16,
-  "iteration": 1634023887045,
+  "iteration": 1634283078581,
   "links": [],
   "panels": [
     {
@@ -696,6 +696,6 @@
   },
   "timezone": "browser",
   "title": "all-node",
-  "uid": "kPv9Fbvnk",
+  "uid": "all-node",
   "version": 47
 }
