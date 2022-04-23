@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import os
-
+import pysnooper
+@pysnooper.snoop()
 def init_db():
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI','')
+    SQLALCHEMY_DATABASE_URI = os.getenv('MYSQL_SERVICE','')
     if SQLALCHEMY_DATABASE_URI:
         import sqlalchemy.engine.url as url
         uri = url.make_url(SQLALCHEMY_DATABASE_URI)
