@@ -276,15 +276,6 @@ class MyappSecurityManager(SecurityManager):
     @staticmethod
     def before_request():
         g.user = current_user
-        # from flask_login.mixins import AnonymousUserMixin
-
-        # if not g.user or not g.user.get_id():
-        #     raise Exception('AnonymousUserMixin')
-        #     return redirect('/')
-
-
-        # if not g.user or g.user.is_anonymous:
-        #
         # if len(request.path)>7 and request.path[:7]!='/static' and g.user and hasattr(g.user, 'username'):
         #     logging.info('------------%s(%s):%s'%(request.method,g.user.username,request.path))
 

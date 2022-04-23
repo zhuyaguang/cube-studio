@@ -98,8 +98,9 @@ LOGO_TARGET_PATH = None
 # AUTH_DB : Is for database (username/password()
 # AUTH_LDAP : Is for LDAP
 # AUTH_REMOTE_USER : Is for using REMOTE_USER from web server
-# AUTH_TYPE = AUTH_DB
-AUTH_TYPE = AUTH_REMOTE_USER
+AUTH_TYPE = AUTH_DB
+
+# AUTH_TYPE = AUTH_REMOTE_USER
 # Uncomment to setup Full admin role name
 # AUTH_ROLE_ADMIN = 'Admin'
 
@@ -185,7 +186,6 @@ IMG_UPLOAD_URL = "/static/file/uploads/"
 
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24  # cache默认超时是24小时，一天才过期
 CACHE_CONFIG = {"CACHE_TYPE": "null"}    # 不使用缓存
-TABLE_NAMES_CACHE_CONFIG = {"CACHE_TYPE": "null"}   # 不使用缓存
 
 # CORS Options
 ENABLE_CORS = True
@@ -293,7 +293,6 @@ CONFIG_PATH_ENV_VAR = "MYAPP_CONFIG_PATH"
 FLASK_APP_MUTATOR = None
 
 # Set this to false if you don't want users to be able to request/grant
-# datasource access requests from/to other users.
 ENABLE_ACCESS_REQUEST = True
 
 # smtp server configuration
@@ -371,7 +370,7 @@ ENABLE_SCHEDULED_EMAIL_REPORTS = True
 SCHEDULED_EMAIL_DEBUG_MODE = True
 
 # 任务的最小执行间隔min
-PIPELINE_TASK_CRON_RESOLUTION = 15
+PIPELINE_TASK_CRON_RESOLUTION = 10
 
 # Email report configuration
 # From address in emails
@@ -457,19 +456,11 @@ def get_env_variable(var_name, default=None):
             raise EnvironmentError(error_msg)
 
 
-OA_APPKEY='3e55b331e0e84092a1366cd5f6fd2843'   # ioa登录时申请的appkey
-ORG_URL='http://oss.esb.oa.com/tme_qm_boss/staffinfo?engName=%s'   # 通过rtx名获取组织架构的地址
-OA_AUTH_URL = 'http://passport.oa.com/modules/passport/signin.ashx?appkey=%s&title=&url=%s'
-OA_LOGOUT_URL='http://passport.oa.com/modules/passport/signout.ashx?appkey=%s&redirect_uri=%s'
-
-
+# 数据库连接池的配置
 SQLALCHEMY_POOL_SIZE = 100
 SQLALCHEMY_POOL_RECYCLE = 300  # 超时重连， 必须小于数据库的超时终端时间
 SQLALCHEMY_MAX_OVERFLOW = 300
-# pool_pre_ping
-
-
-
+SQLALCHEMY_TRACK_MODIFICATIONS=False
 
 # redis的配置
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', 'admin')   # default must set None
@@ -522,6 +513,14 @@ class CeleryConfig(object):
             # 'time_limit': 1,
             'soft_time_limit': 600,   # 只在 prefork pool 里支持
             'ignore_result': True,
+        },
+        'task.check_docker_commit': {
+            'rate_limit': '1/s',
+            'ignore_result': True,
+        },
+        'task.upload_workflow': {
+            'rate_limit': '10/s',
+            'ignore_result': True,
         }
     }
 
@@ -534,53 +533,58 @@ class CeleryConfig(object):
             'schedule': crontab(minute='1'),
         },
         'task_task2': {
-            'task': 'task.make_run_task',
+            'task': 'task.make_timerun_config',
             # 'schedule': 10.0,     #10s中执行一次
-            'schedule': crontab(minute='1'),
+            'schedule': crontab(minute='*/5'),
         },
-        'task_task3': {
+        # 'task_task3': {
+        #     'task': 'task.upload_timerun',
+        #     # 'schedule': 10.0,     #10s中执行一次
+        #     'schedule': crontab(minute='*/5'),
+        # },
+        'task_task4': {
             'task': 'task.delete_old_data',
             # 'schedule': 100.0,     #10s中执行一次
             'schedule': crontab(minute='1', hour='1'),
         },
-        # 'task_task4': {
-        #     'task': 'task.check_pipeline_run',
-        #     # 'schedule': 100.0,     #10s中执行一次
-        #     'schedule': crontab(minute='1', hour='23'),
-        # },
         'task_task5': {
             'task': 'task.delete_notebook',
             # 'schedule': 10.0,
-            'schedule': crontab(minute='1', hour='1'),
+            'schedule': crontab(minute='1', hour='4'),
         },
         # 'task_task6': {
         #     'task': 'task.push_workspace_size',
         #     # 'schedule': 10.0,
         #     'schedule': crontab(minute='10', hour='10'),
         # },
+        'task_task6':{
+            'task':"task.check_pipeline_run",
+            'schedule': crontab(minute='10', hour='11'),
+        },
         'task_task7': {
             'task': 'task.list_train_model',
             # 'schedule': 10.0,
             'schedule': crontab(minute='20', hour='10'),
         },
         'task_task8': {
-            'task': 'task.alert_notebook_renew',
+            'task': 'task.delete_debug_docker',
             # 'schedule': 10.0,
-            'schedule': crontab(minute='30', hour='8'),
+            'schedule': crontab(minute='30', hour='22'),
         },
         'task_task9': {
             'task': 'task.watch_gpu',
             # 'schedule': 10.0,
             'schedule': crontab(minute='10',hour='8-23/2'),
+        },
+        'task_task10': {
+            'task': 'task.adjust_node_resource',
+            # 'schedule': 10.0,
+            'schedule': crontab(minute='*/10'),
         }
     }
 
+DOCUMENTATION_URL=''  # 帮助文档地址，显示在web导航栏
 
-
-
-
-DOCUMENTATION_URL='http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001687933' # 'https://docs.qq.com/doc/DT0JXRGJEUGduZGRE'    # 文档地址
-# BUG_REPORT_URL='https://docs.qq.com/form/fill/DQVhCZUFVYmNZb3Fr?_w_tencentdocx_form=1'    # 文档地址
 ROBOT_PERMISSION_ROLES=[]   # 角色黑名单
 
 FAB_API_MAX_PAGE_SIZE=100    # 最大翻页数目，不设置的话就会是20
@@ -669,20 +673,16 @@ CRD_INFO={
         'kind': 'Framework',
         "timeout": 60 * 60 * 24 * 2
     },
-
-
+    "vcjob": {
+        "group": "batch.volcano.sh",
+        "version": "v1alpha1",
+        'kind': 'Job',
+        "plural": "jobs",
+        "timeout": 60 * 60 * 24 * 2
+    }
 }
 
-# 固定的pvc，在主机的地址和业务容器挂载目录。
-# 主机目录和控制容器以目录必须要一致，这样控制容器操作的就是本地目录
-GLOBAL_PVC_MOUNT={
-    "kubeflow-archives":["/data/k8s/kubeflow/pipeline/archives/",'/archives/'],  # 模型归档的地方
-    "kubeflow-model-deploy":["/data/cfs/qqmusic_cluster/ceph_fuse/meiyangchen/modelbin/",'/modelbin/'],    # 模型部署的地方
-    "kubeflow-user-workspace":["/data/k8s/kubeflow/pipeline/workspace/",'/mnt/'],   # 训练数据的地方
-    "kubeflow-global-pvc":["/data/k8s/kubeflow/global/",'/pvc/'],     # task 配置上传的数据
-}
-
-
+HOST = os.getenv('HOST','localhost')  # 控制平台的入口，ip或者域名
 
 # 每个task都会携带的任务环境变量，{{}}模板变量会在插入前进行渲染
 GLOBAL_ENV={
@@ -698,7 +698,7 @@ GLOBAL_ENV={
     "GPU_TYPE": os.environ.get("GPU_TYPE", "NVIDIA"),
     "KFJ_GPU_MEM_MIN":"13G",
     "KFJ_GPU_MEM_MAX":"13G",
-    "KFJ_ENVIRONMENT": "{{cluster_name]}}",
+    "KFJ_ENVIRONMENT":"{{cluster_name}}",
 }
 GPU_TYPE = os.environ.get("GPU_TYPE", "NVIDIA")
 
@@ -708,39 +708,42 @@ NOTEBOOK_GPU_TYPE='NVIDIA'
 
 # 各类model list界面的帮助文档
 HELP_URL={
-    "pipeline":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001687933",
-    "job_template":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001688629",
-    "task":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001687933",
-    "hp":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001771487",
-    "nni":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001951823",
-    "images":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001702653",
-    "notebook":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001776883",
-    "service":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001838471",
-    "kfserving":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001951821",
-    "model":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001867625"
+    "pipeline":"http://xx.xx/xx",
+    "job_template":"http://xx.xx/xx",
+    "task":"http://xx.xx/xx",
+    "hp":"http://xx.xx/xx",
+    "nni":"http://xx.xx/xx",
+    "images":"http://xx.xx/xx",
+    "notebook":"http://xx.xx/xx",
+    "service":"http://xx.xx/xx",
+    "kfserving":"http://xx.xx/xx",
+    "model":"http://xx.xx/xx",
+    "run":"http://xx.xx/xx",
+    "docker":"http://xx.xx/xx"
 }
 
 # 不使用模板中定义的镜像而直接使用用户镜像的模板名称
 CUSTOMIZE_JOB='自定义镜像'
 
-PIPELINE_TASK_BCC_ADDRESS = 'pengluan'
-ADMIN_USER='pengluan'
+PIPELINE_TASK_BCC_ADDRESS = 'admin'
+ADMIN_USER='admin'
 PIPELINE_NAMESPACE = 'pipeline'
 KATIB_NAMESPACE = 'katib'
 NOTEBOOK_NAMESPACE = 'jupyter'
 SERVICE_NAMESPACE = 'service'
 KFSERVING_NAMESPACE = 'kfserving'
 
-ENVIRONMENT=get_env_variable('ENVIRONMENT','DEV')
+
 KATIB_JOB_DEFAULT_IMAGE='ai.tencentmusic.com/tme-public/katib'
 KATIB_TFJOB_DEFAULT_IMAGE = 'gcr.io/kubeflow-ci/tf-mnist-with-summaries:1.0'
 KATIB_PYTORCHJOB_DEFAULT_IMAGE = 'gcr.io/kubeflow-ci/pytorch-dist-mnist-test:v1.0'
 # 拉取私有仓库镜像默认携带的k8s hubsecret名称
-HUBSECRET = ['csig-hubsecret','hubsecret']
+HUBSECRET = ['hubsecret']
+# 私有仓库的组织名，用户在线构建的镜像自动推送这个组织下面
+REPOSITORY_ORG='ai.tencentmusic/tme-public/'
+# notebook每个pod使用的用户账号
 JUPYTER_ACCOUNTS='jupyter-user'
 HUBSECRET_NAMESPACE=[PIPELINE_NAMESPACE,KATIB_NAMESPACE,NOTEBOOK_NAMESPACE,SERVICE_NAMESPACE,KFSERVING_NAMESPACE]
-
-
 
 # notebook使用的镜像
 NOTEBOOK_IMAGES=[
@@ -766,80 +769,69 @@ WORKSPACE_HOST_PATH = '/data/k8s/kubeflow/pipeline/workspace'
 # 每个用户的归档目录，可以用来存储训练模型
 ARCHIVES_HOST_PATH = "/data/k8s/kubeflow/pipeline/archives"
 # prometheus地址
-PROMETHEUS = 'http://prometheus-k8s.monitoring:9090/api/v1/query_range'
-KFP_HOST = "ml-pipeline.kubeflow:8888"
+PROMETHEUS = 'prometheus-k8s.monitoring:9090'
+KFP_HOST = "http://ml-pipeline.kubeflow:8888"
 
-NNI_IMAGES='ai.tencentmusic.com/tme-public/nni:20211002'
+NNI_IMAGES='ai.tencentmusic.com/tme-public/nni:20211003'
 
-
-HOST = os.getenv('HOST','localhost')  # 控制平台的入口，ip或者域名
 ISTIO_INGRESS_DOMAIN = os.getenv('ISTIO_INGRESS_DOMAIN','local.com')  #  泛化域名，尾缀，可以和HOST不一致，没有泛化域名对应的功能没法使用
-LOGIN_URL = 'http://%s/login'%HOST
-K8S_DASHBOARD_CLUSTER = 'http://%s/k8s/dashboard/cluster/' % HOST  #
-K8S_DASHBOARD_PIPELINE = 'http://%s/k8s/dashboard/pipeline/' % HOST
+K8S_DASHBOARD_CLUSTER = '/k8s/dashboard/cluster/'  #
+K8S_DASHBOARD_PIPELINE = '/k8s/dashboard/pipeline/'
 
-PIPELINE_URL = 'http://%s/pipeline/#/' % HOST
-KATIB_URL = 'http://%s/katib/#' % HOST
+PIPELINE_URL = '/pipeline/#/'
+KATIB_URL = '/katib/#'
 
 # 这两部分功能需要泛化域名。没有泛化域名此部分功能受限
 KFSERVING_DOMAIN = 'kfserving.%s' % ISTIO_INGRESS_DOMAIN
 SERVICE_DOMAIN = 'service.%s' % ISTIO_INGRESS_DOMAIN
 
+# 多行分割内网特定host
+HOSTALIASES='''
+127.0.0.1 localhost
+'''
 
-def checkip(ip):
-    import re
-    p = re.compile('^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$')
-    if p.match(ip):
-        return True
-    else:
-        return False
+SERVICE_EXTERNAL_IP=[]
 
 
 NNI_DOMAIN = HOST  # 如果没有域名就用*   有域名就配置成 HOST
 JUPYTER_DOMAIN = HOST  # 如果没有域名就用*   有域名就配置成 HOST
 
-GRAFANA_TASK = 'http://%s/grafana/d/task/ge-rong-qi-fu-zai-jian-kong?orgId=1&var-instance=All&var-namespace=All&var-pod=' % HOST  # grafana配置的访问task运行数据的网址
 
 ALL_LINKS=[
     {
         "label":"Minio",
         "name":"minio",
-        "url":"http://%s/minio/public/"%HOST
+        "url":"/minio/public/"
     },
     {
         "label": "K8s Dashboard",
         "name": "kubernetes_dashboard",
-        "url": K8S_DASHBOARD_CLUSTER +"#/pod?namespace=infra"
+        "url": "/k8s/dashboard/cluster/#/pod?namespace=infra"
     },
     {
         "label":"Grafana",
         "name":"grafana",
-        "url": 'http://%s/grafana/'%HOST  # 访问grafana的域名地址
+        "url": '/grafana/'  # 访问grafana的域名地址
     }
 ]
 
-# 多集群应用
+# 所有训练集群的信息
 CLUSTERS={
     # 和project expand里面的名称一致
     "dev":{
         "NAME":"dev",
-        "KUBECONFIG":'/home/myapp/kubeconfig/dev-config',
-        "HOST":'kubeflow.local.com',
-        "K8S_DASHBOARD_CLUSTER":'http://kubeflow.local.com/k8s/dashboard/cluster/',
-        "KFP_HOST": '9.135.92.226:11567',
-        "PIPELINE_URL": 'http://kubeflow.local.com/pipeline/#/'
-    },
-    # 至少要有一个这个
-    "local":{
-        "NAME":"local",
-        "KUBECONFIG":'',
-        "K8S_DASHBOARD_CLUSTER":K8S_DASHBOARD_CLUSTER,
-        "KFP_HOST":KFP_HOST,
-        "PIPELINE_URL":PIPELINE_URL
-    }
+        "KUBECONFIG":'/home/myapp/kubeconfig/dev-kubeconfig',
+        "K8S_DASHBOARD_CLUSTER":'/k8s/dashboard/cluster/',
+        "KFP_HOST": 'http://ml-pipeline.kubeflow:8888',
+        "PIPELINE_URL": '/pipeline/#/',
+        "GRAFANA_TASK": '/grafana/d/pod-info/pod-info?orgId=1&var-pod=',  # grafana配置的访问task运行数据的网址
+         "GRAFANA_SERVICE":"/grafana/d/istio-service/istio-service?orgId=1&var-namespace=service&var-service="    # grafana配置的访问service数据的网址
+
+}
 }
 
-
+# 当前控制器所在的集群
+ENVIRONMENT=get_env_variable('ENVIRONMENT','DEV').lower()
 
 
 

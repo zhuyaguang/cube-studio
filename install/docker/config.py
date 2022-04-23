@@ -98,8 +98,9 @@ LOGO_TARGET_PATH = None
 # AUTH_DB : Is for database (username/password()
 # AUTH_LDAP : Is for LDAP
 # AUTH_REMOTE_USER : Is for using REMOTE_USER from web server
-# AUTH_TYPE = AUTH_DB
-AUTH_TYPE = AUTH_REMOTE_USER
+AUTH_TYPE = AUTH_DB
+
+# AUTH_TYPE = AUTH_REMOTE_USER
 # Uncomment to setup Full admin role name
 # AUTH_ROLE_ADMIN = 'Admin'
 
@@ -454,13 +455,11 @@ def get_env_variable(var_name, default=None):
             raise EnvironmentError(error_msg)
 
 
-SQLALCHEMY_POOL_SIZE = 500
+# 数据库连接池的配置
+SQLALCHEMY_POOL_SIZE = 100
 SQLALCHEMY_POOL_RECYCLE = 300  # 超时重连， 必须小于数据库的超时终端时间
-SQLALCHEMY_MAX_OVERFLOW = 800
+SQLALCHEMY_MAX_OVERFLOW = 300
 SQLALCHEMY_TRACK_MODIFICATIONS=False
-
-
-
 
 # redis的配置
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', 'admin')   # default must set None
@@ -495,6 +494,7 @@ class CeleryConfig(object):
     # CELERYD_TASK_TIME_LIMIT = 60
     # 任务发送完成是否需要确认，对性能会稍有影响
     CELERY_ACKS_LATE = True
+    CELERY_SEND_TASK_SENT_EVENT = True
     # celery worker的并发数，默认是服务器的内核数目, 也是命令行 - c参数指定的数目
     # CELERYD_CONCURRENCY = 4
     CELERY_TIMEZONE = 'Asia/Shanghai'
@@ -583,12 +583,8 @@ class CeleryConfig(object):
         }
     }
 
+DOCUMENTATION_URL=''  # 帮助文档地址，显示在web导航栏
 
-
-
-
-DOCUMENTATION_URL='https://docs.qq.com/doc/DU0ptZEpiSmtMY1JT'
-# BUG_REPORT_URL='http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001688387'    # 文档地址
 ROBOT_PERMISSION_ROLES=[]   # 角色黑名单
 
 FAB_API_MAX_PAGE_SIZE=100    # 最大翻页数目，不设置的话就会是20
@@ -658,8 +654,8 @@ CRD_INFO={
         "timeout": 60 * 60 * 24 * 2
     },
     "inferenceservice": {
-        "group": "serving.kubeflow.org",
-        "version": "v1alpha2",
+        "group": "serving.kserve.io",
+        "version": "v1beta1",
         "plural": "inferenceservices",
         'kind':'InferenceService',
         "timeout": 60 * 60 * 24 * 1
@@ -685,17 +681,6 @@ CRD_INFO={
         "plural": "jobs",
         "timeout": 60 * 60 * 24 * 2
     }
-
-}
-
-
-# 固定的pvc，在主机的地址和业务容器挂载目录。
-# 主机目录和控制容器以目录必须要一致，这样控制容器操作的就是本地目录
-GLOBAL_PVC_MOUNT={
-    "kubeflow-archives":["/data/k8s/kubeflow/pipeline/archives/",'/archives/'],  # 模型归档的地方
-    "kubeflow-model-deploy":["/data/cfs/qqmusic_cluster/ceph_fuse/meiyangchen/modelbin/",'/modelbin/'],    # 模型部署的地方
-    "kubeflow-user-workspace":["/data/k8s/kubeflow/pipeline/workspace/",'/mnt/'],   # 训练数据的地方
-    "kubeflow-global-pvc":["/data/k8s/kubeflow/global/",'/pvc/'],     # task 配置上传的数据
 }
 
 HOST = os.getenv('HOST','localhost')  # 控制平台的入口，ip或者域名
@@ -724,42 +709,46 @@ NOTEBOOK_GPU_TYPE='NVIDIA'
 
 # 各类model list界面的帮助文档
 HELP_URL={
-    "pipeline":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001687933",
-    "job_template":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001688629",
-    "task":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001687933",
-    "hp":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001771487",
-    "nni":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001951823",
-    "images":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001702653",
-    "notebook":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001776883",
-    "service":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001838471",
-    "kfserving":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001951821",
-    "model":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693001867625",
-    "run":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693002080729",
-    "docker":"http://tapd.oa.com/kubeflow/markdown_wikis/show/#1220424693002082587"
+    "pipeline":"http://xx.xx/xx",
+    "job_template":"http://xx.xx/xx",
+    "task":"http://xx.xx/xx",
+    "hp":"http://xx.xx/xx",
+    "nni":"http://xx.xx/xx",
+    "images":"http://xx.xx/xx",
+    "notebook":"http://xx.xx/xx",
+    "service":"http://xx.xx/xx",
+    "kfserving":"http://xx.xx/xx",
+    "inferenceservice":"http://xx.xx/xx",
+    "model":"http://xx.xx/xx",
+    "run":"http://xx.xx/xx",
+    "docker":"http://xx.xx/xx"
 }
 
 # 不使用模板中定义的镜像而直接使用用户镜像的模板名称
 CUSTOMIZE_JOB='自定义镜像'
 
-PIPELINE_TASK_BCC_ADDRESS = 'pengluan'
-ADMIN_USER='pengluan,uthermai'
+PIPELINE_TASK_BCC_ADDRESS = 'admin'
+ADMIN_USER='admin'
 PIPELINE_NAMESPACE = 'pipeline'
+SERVICE_PIPELINE_NAMESPACE='service'
 KATIB_NAMESPACE = 'katib'
 NOTEBOOK_NAMESPACE = 'jupyter'
 SERVICE_NAMESPACE = 'service'
+PRE_SERVICE_NAMESPACE = 'pre-service'
 KFSERVING_NAMESPACE = 'kfserving'
-
+SERVICE_PIPELINE_ZIPKIN='http://xx.xx.xx.xx:9401'
+SERVICE_PIPELINE_JAEGER='tracing.service'
 
 KATIB_JOB_DEFAULT_IMAGE='ai.tencentmusic.com/tme-public/katib'
 KATIB_TFJOB_DEFAULT_IMAGE = 'gcr.io/kubeflow-ci/tf-mnist-with-summaries:1.0'
 KATIB_PYTORCHJOB_DEFAULT_IMAGE = 'gcr.io/kubeflow-ci/pytorch-dist-mnist-test:v1.0'
 # 拉取私有仓库镜像默认携带的k8s hubsecret名称
-HUBSECRET = ['csig-hubsecret','hubsecret']
+HUBSECRET = ['hubsecret']
 # 私有仓库的组织名，用户在线构建的镜像自动推送这个组织下面
-REPOSITORY_ORG='csighub.tencentyun.com/tme-kubeflow/'
+REPOSITORY_ORG='ai.tencentmusic/tme-public/'
+# notebook每个pod使用的用户账号
 JUPYTER_ACCOUNTS='jupyter-user'
 HUBSECRET_NAMESPACE=[PIPELINE_NAMESPACE,KATIB_NAMESPACE,NOTEBOOK_NAMESPACE,SERVICE_NAMESPACE,KFSERVING_NAMESPACE]
-
 
 # notebook使用的镜像
 NOTEBOOK_IMAGES=[
@@ -802,20 +791,16 @@ KATIB_URL = '/katib/#'
 KFSERVING_DOMAIN = 'kfserving.%s' % ISTIO_INGRESS_DOMAIN
 SERVICE_DOMAIN = 'service.%s' % ISTIO_INGRESS_DOMAIN
 
+# 多行分割内网特定host
 HOSTALIASES='''
-10.123.119.83 login.oa.com
-10.14.83.153 passport.oa.com
-11.181.92.133 ml-pipeline.idc.woa.com
-10.101.140.98 cls-g9v4gmm0.ccs.tencent-cloud.com
-9.149.109.34 csighub.tencentyun.com
-9.2.87.192 mirrors.cloud.tencent.com
-9.2.87.192 mirrors.tencent.com
-169.254.0.30 mirrors-tlinux.tencentyun.com
-9.56.40.58 git.woa.com
-10.56.12.205 api.weixin.oa.com
+127.0.0.1 localhost
 '''
 
-SERVICE_EXTERNAL_IP=['10.101.142.31']
+SERVICE_EXTERNAL_IP=[]
+
+
+NNI_DOMAIN = HOST  # 如果没有域名就用*   有域名就配置成 HOST
+JUPYTER_DOMAIN = HOST  # 如果没有域名就用*   有域名就配置成 HOST
 
 
 ALL_LINKS=[
@@ -833,49 +818,74 @@ ALL_LINKS=[
         "label":"Grafana",
         "name":"grafana",
         "url": '/grafana/'  # 访问grafana的域名地址
-    },
-    {
-        "label": "isd",
-        "name": "isd",
-        "url": 'http://music.isd.com/ips/1373530/?ips=26'  # 访问grafana的域名地址
     }
 ]
 
-# 所有训练集群的信息
-CLUSTERS={
-    # 和project expand里面的名称一致
-    # "dev":{
-    #     "NAME":"dev",
-    #     "KUBECONFIG":'/home/myapp/kubeconfig/dev-kubeconfig',
-    #     "K8S_DASHBOARD_CLUSTER":'http://kubeflow.local.com/k8s/dashboard/cluster/',
-    #     "KFP_HOST": 'http://9.135.92.226:8888',
-    #     "PIPELINE_URL": 'http://kubeflow.local.com/pipeline/#/',
-    #     "JUPYTER_DOMAIN":"kubeflow.local.com",
-    #     "NNI_DOMAIN":'kubeflow.local.com'
-    # },
-    "idc":{
-        "NAME":"idc",
-        "KUBECONFIG":'/home/myapp/kubeconfig/idc-kubeconfig',
-        "K8S_DASHBOARD_CLUSTER":'http://kubeflow.idc.woa.com/k8s/dashboard/cluster/',
-        "KFP_HOST": 'http://9.146.216.38:8080',
-        "PIPELINE_URL": 'http://kubeflow.idc.woa.com/pipeline/#/',
-        "GRAFANA_TASK":'http://kubeflow.idc.woa.com/grafana/d/pod-info/pod-info?orgId=1&var-pod=',
-        "GRAFANA_SERVICE":"http://kubeflow.idc.woa.com/grafana/d/istio-service/istio-service?orgId=1&var-namespace=service&var-service="
-    },
-    # # 至少要有一个这个
-    "tke":{
-        "NAME":"tke",
-        "KUBECONFIG":'/home/myapp/kubeconfig/tke-kubeconfig',
-        "K8S_DASHBOARD_CLUSTER":'/k8s/dashboard/cluster/',
-        "KFP_HOST":"http://ml-pipeline.kubeflow:8888",
-        "PIPELINE_URL":'/pipeline/#/',
-        "GRAFANA_TASK":'/grafana/d/pod-info/pod-info?orgId=1&var-pod=',  # grafana配置的访问task运行数据的网址
-        "GRAFANA_SERVICE":"/grafana/d/istio-service/istio-service?orgId=1&var-namespace=service&var-service="    # grafana配置的访问service数据的网址
-    }
+TFSERVING_IMAGES=['ai.tencentmusic.com/tme-public/serving:1.11.0','ai.tencentmusic.com/tme-public/serving:1.11.0-gpu','ai.tencentmusic.com/tme-public/serving:1.12.0','ai.tencentmusic.com/tme-public/serving:1.12.0-gpu','ai.tencentmusic.com/tme-public/serving:1.13.0','ai.tencentmusic.com/tme-public/serving:1.13.0-gpu','ai.tencentmusic.com/tme-public/serving:1.14.0','ai.tencentmusic.com/tme-public/serving:1.14.0-gpu','ai.tencentmusic.com/tme-public/serving:2.0.0','ai.tencentmusic.com/tme-public/serving:2.0.0-gpu','ai.tencentmusic.com/tme-public/serving:2.1.4','ai.tencentmusic.com/tme-public/serving:2.1.4-gpu','ai.tencentmusic.com/tme-public/serving:2.2.3','ai.tencentmusic.com/tme-public/serving:2.2.3-gpu','ai.tencentmusic.com/tme-public/serving:2.3.4','ai.tencentmusic.com/tme-public/serving:2.3.4-gpu','ai.tencentmusic.com/tme-public/serving:2.4.3','ai.tencentmusic.com/tme-public/serving:2.4.3-gpu','ai.tencentmusic.com/tme-public/serving:2.5.2','ai.tencentmusic.com/tme-public/serving:2.5.2-gpu','ai.tencentmusic.com/tme-public/serving:2.6.0','ai.tencentmusic.com/tme-public/serving:2.6.0-gpu']
+TRITONSERVER_IMAGES=['ai.tencentmusic.com/tme-public/tritonserver:21.12-py3','ai.tencentmusic.com/tme-public/tritonserver:21.09-py3']
+TORCHSERVER_IMAGES=['ai.tencentmusic.com/tme-public/torchserve:0.5.0-cpu','ai.tencentmusic.com/tme-public/torchserve:0.5.0-gpu','ai.tencentmusic.com/tme-public/torchserve:0.4.2-cpu','ai.tencentmusic.com/tme-public/torchserve:0.4.2-gpu']
+INFERNENCE_IMAGES={
+    "tfserving":TFSERVING_IMAGES,
+    'torch-server':TORCHSERVER_IMAGES,
+    'onnxruntime':['ai.tencentmusic.com/tme-public/onnxruntime:v1.0.0','ai.tencentmusic.com/tme-public/onnxruntime:server-latest'],
+    'triton-server':TRITONSERVER_IMAGES,
+    'kfserving-tf': TFSERVING_IMAGES,
+    "kfserving-torch":TORCHSERVER_IMAGES,
+    "kfserving-triton": TRITONSERVER_IMAGES,
+    'kfserving-sklearn': ['ai.tencentmusic.com/tme-public/sklearnserver:v0.7.0'],
+    'kfserving-xgboost': ['ai.tencentmusic.com/tme-public/sklearnserver:v0.7.0'],
+    'kfserving-lightgbm':['ai.tencentmusic.com/tme-public/lgbserver:v0.7.0'],
+    'kfserving-paddle':['ai.tencentmusic.com/tme-public/paddleserver:v0.7.0']
 }
+
+INFERNENCE_COMMAND={
+    "tfserving":"/usr/bin/tf_serving_entrypoint.sh --model_config_file=/config/models.config --monitoring_config_file=/config/monitoring.config --platform_config_file=/config/platform.config",
+    "torch-server":"torchserve --start --model-store /models/$model_name/ --models $model_name=$model_name.mar --foreground --log-config /config/log4j2.xml",
+    "onnxruntime":"onnxruntime_server --model_path /models/",
+    "triton-server":'tritonserver --model-repository=/models/ --strict-model-config=true --log-verbose=1'
+}
+INFERNENCE_ENV={
+    "tfserving":['TF_CPP_VMODULE=http_server=1','TZ=Asia/Shanghai'],
+}
+INFERNENCE_PORTS={
+    "tfserving":'8501',
+    "torch-server":"8080,8081",
+    "onnxruntime":"8001",
+    "triton-server":"8000,8002"
+}
+INFERNENCE_METRICS={
+    "tfserving":'8501:/metrics',
+    "torch-server":"8082:/metrics",
+    "triton-server":"8002:/metrics"
+}
+INFERNENCE_HEALTH={
+    "tfserving":'8501:/v1/models/$model_name/versions/$model_version/metadata',
+    "torch-server":"8080:/ping",
+    "triton-server":"8000:/v2/health/ready"
+}
+GRAFANA_TASK_PATH='/grafana/d/pod-info/pod-info?var-pod='
+GRAFANA_SERVICE_PATH="/grafana/d/istio-service/istio-service?var-namespace=service&var-service="
+GRAFANA_CLUSTER_PATH="/grafana/d/all-node/all-node?var-org="
+GRAFANA_NODE_PATH="/grafana/d/node/node?var-node="
+GPU_CHOICE_ARR = ["0","1(T4)","2(T4)","1(V100)","2(V100)","1(A100)","2(A100)","1(vgpu)"]
+GPU_CHOICES = [[choice,choice] for choice in GPU_CHOICE_ARR]
 # 当前控制器所在的集群
 ENVIRONMENT=get_env_variable('ENVIRONMENT','DEV').lower()
 # ENVIRONMENT='tke'
+# 所有训练集群的信息
+CLUSTERS={
+    # 和project expand里面的名称一致
+    "dev":{
+        "NAME":"dev",
+        "KUBECONFIG":'/home/myapp/kubeconfig/dev-kubeconfig',
+        "K8S_DASHBOARD_CLUSTER":'http://kubeflow.local.com/k8s/dashboard/cluster/',
+        "KFP_HOST": 'http://ml-pipeline.kubeflow:8888',
+        "PIPELINE_URL": 'http://kubeflow.local.com/pipeline/#/',
+        "JUPYTER_DOMAIN":"kubeflow.local.com",
+        "NNI_DOMAIN":'kubeflow.local.com'
+    }
+}
+
 
 
 

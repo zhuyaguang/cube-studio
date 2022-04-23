@@ -80,15 +80,15 @@ spec:
         - command:
             - ./event_exporter
           env: []
-          image: docker.oa.com:8080/qqmusic-di/event-exporter 
+          image: ai.tencentmusic.com/tme-public/event-exporter
           imagePullPolicy: IfNotPresent
           name: event-exporter
           ports:
             - containerPort: 9102
               name: http
           resources:
-            limits:
-              memory: 100Mi
+#            limits:
+#              memory: 100Mi
             requests:
               memory: 40Mi
       serviceAccountName: event-exporter

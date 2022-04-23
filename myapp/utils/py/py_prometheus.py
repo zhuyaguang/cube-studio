@@ -147,9 +147,8 @@ class Prometheus():
         return back
 
 # if __name__ == "__main__":
-#     prometheus = Prometheus('127.0.0.1:9090')
-#     aa = prometheus.get_resource_metric('tfjob-aifm-daily-test','pipeline')
-#     print(aa)
+#     prometheus = Prometheus('10.101.142.128:8081')
+#     prometheus.get_machine_metric()
 
 
 

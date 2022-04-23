@@ -11,9 +11,9 @@ config='''global:
   resolve_timeout: 5m
   slack_api_url: 'https://hooks.slack.com/services/your_slack_api_token'
   smtp_smarthost: 'smtp.exmail.qq.com:465'
-  smtp_from: 'pengluan@tencent.com'
+  smtp_from: 'xxxx@tencent.com'
   smtp_hello: 'tencent.com'
-  smtp_auth_username: 'pengluan@tencent.com'
+  smtp_auth_username: 'xxxx@tencent.com'
   smtp_auth_password: 'xxxxxxxxx'
   smtp_require_tls: false
 templates:
@@ -27,7 +27,7 @@ route:
   routes:
   - match:
       namespace: infra
-    receiver: 'di'
+    receiver: 'default'
 
 inhibit_rules:
 - source_match:
@@ -37,7 +37,7 @@ inhibit_rules:
   # Apply inhibition if the alertname is the same.
   equal: ['alertname', 'cluster', 'service']
 receivers:
-- name: 'pengluan'
+- name: 'default'
   slack_configs:
   - channel: '#your_slack_channel'
     title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] Prometheus Event Notification'
@@ -52,7 +52,7 @@ receivers:
         {{ end }}
     send_resolved: false
   email_configs:
-  - to: 'pengluan@tencent.com'
+  - to: 'xxxx@tencent.com'
     send_resolved: true
 - name: 'null'
 '''

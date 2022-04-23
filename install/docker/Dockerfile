@@ -1,4 +1,4 @@
-# docker build -t ai.tencentmusic.com/tme-public/kubeflow-dashboard:tme-2021.10.01.17 -f install/docker/Dockerfile .
+# docker build -t ai.tencentmusic.com/tme-public/kubeflow-dashboard:2022.02.01 -f install/docker/Dockerfile .
 
 FROM ai.tencentmusic.com/tme-public/kubeflow-dashboard:base
 
@@ -8,20 +8,15 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash
 RUN apt-get -y install nodejs && npm install yarn -g
 
 RUN rm /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python && rm /usr/bin/pip && ln -s /usr/bin/pip3 /usr/bin/pip
-RUN pip install docstring_parser kfp kfserving
+RUN pip install pip --upgrade && pip install docstring_parser kfp==1.8.0  kfserving
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x kubectl && mv kubectl /usr/bin/
 RUN mkdir /kubeflow && wget -P /kubeflow/ https://docker-76009.sz.gfp.tencent-cloud.com/kubeflow/src.tar.gz && tar -zxvf /kubeflow/src.tar.gz -C /kubeflow/ && rm /kubeflow/src.tar.gz
 # katib 需要kubernetes10.0版本
 #RUN pip install kubernetes==10.0.0
 # kfserving需要kubernetes 12.0版本
-RUN pip install kubernetes==12.0.1
+RUN pip install kubernetes==18.20.0 click==6.7 jaeger-client==4.6.1 opentracing-instrumentation
 COPY install/docker/docker-add-file/rest.py /usr/local/lib/python3.6/dist-packages/kubernetes/client/rest.py
 COPY install/docker/docker-add-file/__init__.py /usr/local/lib/python3.6/dist-packages/marshmallow_enum/__init__.py
-
-# 安装七彩石配置
-RUN pip install rainbow-admin -i https://mirrors.tencent.com/repository/pypi/tencent_pypi/simple --extra-index-url https://mirrors.tencent.com/pypi/simple/ --upgrade
-# 安装北极星的配置
-RUN pip install polaris-python --index-url https://mirrors.cloud.tencent.com/pypi/simple/  --extra-index-url https://mirrors.tencent.com/repository/pypi/tencent_pypi/simple/
 
 COPY myapp /home/myapp/myapp
 ENV PATH=/home/myapp/myapp/bin:$PATH
@@ -32,7 +27,6 @@ COPY install/docker/entrypoint.sh /entrypoint.sh
 
 # ENTRYPOINT ["/entrypoint.sh"]
 # HEALTHCHECK CMD ["curl", "-f", "http://localhost:80/health"]
-
 
 
 

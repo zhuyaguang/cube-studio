@@ -3,19 +3,56 @@
 
 如果使用tke选择独立集群(非托管集群)，这样方便自行管理api server启动参数，部署istio
 
+# 单机测试
+
+在单机上将k8s的kubeconfig文件保存为
+cube-studio/install/kubernetes/config
+```
+cd cube-studio/install/kubernetes/
+sh start.sh
+```
+[单机部署参考视频](https://docker-76009.sz.gfp.tencent-cloud.com/kubeflow/install_standalone.mp4)
+ 
+# 通过label进行机器管理  
+开发训练服务机器管理：
+- 对于cpu的train/notebook/service会选择cpu=true的机器  
+- 对于gpu的train/notebook/service会选择gpu=true的机器  
+
+- 训练任务会选择train=true的机器  
+- notebook会选择notebook=true的机器  
+- 服务化会选择service=true的机器  
+- 不同项目的任务会选择对应org=xx的机器。默认为org=public 
+- 可以通过gpu-type=xx表示gpu的型号
+  
+控制器机器管理：
+- mysql=true 部署mysql服务的机器
+- redis=true 部署mysql服务的机器
+- kubeflow-dashobard=true 部署cube服务的机器
+- kubeflow=true 部署kubeflow的机器
+- isito=true 部署istio的机器
+- knative=true 部署knative的机器
+- monitoring=true 部署prometheus的机器
+
 # 分布式存储
 
 目前机器学习平台依赖强io性能的分布式存储。  建议使用ssd的ceph作为分布式存储。并注意配置好开机自动挂载避免在机器重启后挂载失效
 
  ！！！重要：分布式文件系统需要挂载到每台机器的/data/k8s/下面，当然也可以挂载其他目录下，以软链的形式链接到/data/k8s/下 
 
-需要每天机器都有对应的目录/data/k8s为分布式存储目录
+需要每台机器都有对应的目录/data/k8s为分布式存储目录
 ```bash  
 mkdir -p /data/k8s/kubeflow/minio  
 mkdir -p /data/k8s/kubeflow/global  
 mkdir -p /data/k8s/kubeflow/pipeline/workspace  
 mkdir -p /data/k8s/kubeflow/pipeline/archives  
 ```  
+平台pvc会使用这些分布式存储目录下的subpath，所以如果你是rancher部署k8s集群，需要在kubelet容器中挂载主机的/data/k8s/目录到kubelet容器的/data/k8s/目录。
+rancher修改kubelet容器挂载目录(选中集群-升级-编辑yaml)
+```
+    kubelet:
+      extra_binds:
+        - '/data/k8s:/data/k8s'
+```
   
 # gpu环境的准备  
 1、找运维同学在机器上安装gpu驱动  
@@ -35,7 +72,7 @@ cat /etc/docker/daemon.json
     }  
 }  
 ```  
-# 如果是内网部署，需要先把镜像传递到私有仓库，在从私有仓库拉取到每台机器上  
+# 如果是内网部署，需要先把镜像传递到私有仓库，再从私有仓库拉取到每台机器上  
   
 ```bash  
 sh pull_image_kubeflow.sh  
@@ -55,29 +92,18 @@ sh create_ns_secret.sh
 kubectl apply -f dashboard/v2.2.0-cluster.yaml  
 kubectl apply -f dashboard/v2.2.0-user.yaml  
 ```  
-# 部署kube-batch  
-kube-batch用来实现gang调度  
-```bash  
-kubectl apply -f kube-batch/deploy.yaml  
-```  
-  
+
 # 部署元数据组件mysql  
 参考mysql/readme.md  
 
-创建所需要的各类数据库
-```bash
-CREATE DATABASE IF NOT EXISTS kubeflow DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-CREATE DATABASE IF NOT EXISTS mlpipeline DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-CREATE DATABASE IF NOT EXISTS katib DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-CREATE DATABASE IF NOT EXISTS metadb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-CREATE DATABASE IF NOT EXISTS cachedb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-```
-  
 # 部署缓存组件redis  
 参考redis/readme.md  
   
-# 部署kubeflow  
-参考kubeflow/v1.2.0/readme.md  
+# 部署kube-batch  
+kube-batch用来实现gang调度  
+```bash  
+kubectl create -f kube-batch/deploy.yaml  
+```  
   
 # 部署prometheus生态组件  
 参考prometheus/readme.md  
@@ -92,6 +118,10 @@ CREATE DATABASE IF NOT EXISTS cachedb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE
 ```bash
 kubectl apply -f volcano/volcano-development.yaml
 ```
+
+# 部署kubeflow  
+参考kubeflow/v1.2.0/readme.md  
+
 
 # 部署 管理平台  
 
@@ -147,20 +177,11 @@ kubectl create -f pv-pvc-service.yaml
 kubectl apply -f gateway.yaml  
 # 创建新的账号需要  
 kubectl apply -f sa-rbac.yaml          
-# 修改并创建virtual。需要将其中的域名kubeflow.local.com批量修改为平台的域名
+# 修改并创建virtual。需要将其中的管理平台的域名批量修改为平台的域名
 kubectl apply -f virtual.yaml  
 ```  
   
-# 通过label进行机器管理  
 
-- 对于cpu的train/notebook/service会选择cpu=true的机器  
-- 对于gpu的train/notebook/service会选择gpu=true的机器  
-
-- 训练任务会选择train=true的机器  
-- notebook会选择notebook=true的机器  
-- 服务化会选择service=true的机器  
-- 不同项目的任务会选择对应org=xx的机器。默认为org=public 
-  
 
 # kube-scheduler调度策略
 可以参考 https://docs.qq.com/doc/DWFVqcFd0S29WUGxD

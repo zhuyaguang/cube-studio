@@ -20,13 +20,17 @@ data:
       # Disabling symbolic-links is recommended to prevent assorted security risks
       symbolic-links=0
       bind-address    = 0.0.0.0
-      max_connections = 10000
+      max_connections = 1000
       innodb_buffer_pool_size=2G
       explicit_defaults_for_timestamp = 1
       character_set_server=utf8
       init_connect='SET NAMES utf8'
-      default-character-set=utf8
-      # skip-grant-tables
+      skip-grant-tables
 
-    [client]
-      default-character-set=utf8
+  init.sql: |-
+    CREATE DATABASE IF NOT EXISTS kubeflow DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+    CREATE DATABASE IF NOT EXISTS mlpipeline DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+    CREATE DATABASE IF NOT EXISTS katib DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+    CREATE DATABASE IF NOT EXISTS metadb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+    CREATE DATABASE IF NOT EXISTS cachedb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+
