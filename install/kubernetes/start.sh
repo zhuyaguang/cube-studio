@@ -1,6 +1,6 @@
-mkdir ~/.kube/
+mkdir ~/.kube/ kubeconfig
 cp config ~/.kube/config
-#cp config kubeconfig/dev-kubeconfig
+cp config kubeconfig/dev-kubeconfig
 
 node=`kubectl get node |grep worker | awk '{print $1}' | head -n 1`
 kubectl label node $node train=true cpu=true notebook=true service=true org=public istio=true knative=true kubeflow=true kubeflow-dashboard=true mysql=true redis=true monitoring=true logging=true --overwrite
