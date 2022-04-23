@@ -1,4 +1,4 @@
-mkdir ~/.kube/ kubeconfig
+mkdir -p ~/.kube/ kubeconfig /data/k8s/kubeflow/pipeline/workspace /data/k8s/kubeflow/pipeline/archives
 cp config ~/.kube/config
 cp config kubeconfig/dev-kubeconfig
 
