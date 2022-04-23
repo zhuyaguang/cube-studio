@@ -47,7 +47,7 @@ spec:
               subPath: mysqld.cnf
               readOnly: False
             - name: mysql-configmap
-              mountPath: /docker-entrypoint-initdb.d/init/init.sql
+              mountPath: /docker-entrypoint-initdb.d/init.sql
               subPath: init.sql
               readOnly: False
           ports:
