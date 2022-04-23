@@ -8,10 +8,10 @@ resources:
   - ml-pipeline-apiserver-rolebinding.yaml
   - ml-pipeline-apiserver-sa.yaml
   - ml-pipeline-apiserver-service.yaml
-#  - ml-pipeline-persistenceagent-deployment.yaml
-#  - ml-pipeline-persistenceagent-role.yaml
-#  - ml-pipeline-persistenceagent-rolebinding.yaml
-#  - ml-pipeline-persistenceagent-sa.yaml
+  - ml-pipeline-persistenceagent-deployment.yaml
+  - ml-pipeline-persistenceagent-role.yaml
+  - ml-pipeline-persistenceagent-rolebinding.yaml
+  - ml-pipeline-persistenceagent-sa.yaml
 #  - ml-pipeline-scheduledworkflow-deployment.yaml
 #  - ml-pipeline-scheduledworkflow-role.yaml
 #  - ml-pipeline-scheduledworkflow-rolebinding.yaml
@@ -22,10 +22,10 @@ resources:
   - ml-pipeline-ui-rolebinding.yaml
   - ml-pipeline-ui-sa.yaml
   - ml-pipeline-ui-service.yaml
-#  - ml-pipeline-viewer-crd-role.yaml
-#  - ml-pipeline-viewer-crd-rolebinding.yaml
-#  - ml-pipeline-viewer-crd-deployment.yaml
-#  - ml-pipeline-viewer-crd-sa.yaml
+  - ml-pipeline-viewer-crd-role.yaml
+  - ml-pipeline-viewer-crd-rolebinding.yaml
+  - ml-pipeline-viewer-crd-deployment.yaml
+  - ml-pipeline-viewer-crd-sa.yaml
   - ml-pipeline-visualization-deployment.yaml
   - ml-pipeline-visualization-sa.yaml
   - ml-pipeline-visualization-service.yaml
