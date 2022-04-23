@@ -38,7 +38,7 @@ spec:
       - name: hubsecret
       containers:
         - name: mysql
-          image: mysql:5.7
+          image: mysql:8.0.26    # mysql:5.7
           volumeMounts:
             - name: data
               mountPath: /var/lib/mysql
