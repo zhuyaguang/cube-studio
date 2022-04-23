@@ -120,9 +120,9 @@ kubectl apply -f kubeflow/pipeline/minio-artifact-secret.yaml
 kubectl apply -f kubeflow/pipeline/pipeline-runner-rolebinding.yaml
 
 cd kubeflow/pipeline/1.6.0/kustomize/
-kubectl apply -k cluster-scoped-resources/
+kustomize build cluster-scoped-resources/ | kubectl apply -f -
 kubectl wait crd/applications.app.k8s.io --for condition=established --timeout=60s
-kubectl apply -k env/platform-agnostic/
+kustomize build env/platform-agnostic/  | kubectl apply -f -
 cd ../../../../
 
 # 部署xgb
