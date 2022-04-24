@@ -24,13 +24,13 @@ kubectl create -f redis/pv-hostpath.yaml
 kubectl create -f redis/configmap.yaml
 kubectl create -f redis/service.yaml
 # 如果自己需要使用pv来保存redis队列数据，可以修改master.yaml
-kubectl create -f master.yaml
+kubectl create -f redis/master.yaml
 # 部署kube-batch
 kubectl create -f kube-batch/deploy.yaml
 
 # 部署prometheus
 cd prometheus
-mkdir -r /data/k8s/monitoring/grafana/
+mkdir -p /data/k8s/monitoring/grafana/
 chmod -R 777 /data/k8s/monitoring/grafana/
 kubectl apply -f ./operator/bundle.yaml
 kubectl apply -f ./alertmanater/alertmanager-main-sa.yml
