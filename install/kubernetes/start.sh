@@ -71,12 +71,13 @@ kubectl apply -f ./servicemonitor/node-exporter-sm.yml
 kubectl apply -f ./servicemonitor/prometheus-operator-sm.yml
 kubectl apply -f ./servicemonitor/prometheus-sm.yml
 kubectl apply -f ./servicemonitor/pushgateway-sm.yml
-kubectl apply -f ./gpu/dcgm-exporter.yml
-kubectl apply -f ./gpu/dcgm-exporter-sm.yml
 kubectl apply -f ./prometheus_adapter/metric_rule.yaml
 kubectl apply -f ./prometheus_adapter/prometheus_adapter.yaml
 cd ../
 
+# 部署gpu的监控
+kubectl apply -f gpu/dcgm-exporter.yml
+kubectl apply -f gpu/dcgm-exporter-sm.yml
 
 # 部署frameworkcontroller
 
