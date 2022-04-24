@@ -76,8 +76,8 @@ kubectl apply -f ./prometheus_adapter/prometheus_adapter.yaml
 cd ../
 
 # 部署gpu的监控
-kubectl apply -f gpu/dcgm-exporter.yml
-kubectl apply -f gpu/dcgm-exporter-sm.yml
+kubectl apply -f gpu/dcgm-exporter.yaml
+kubectl apply -f gpu/dcgm-exporter-sm.yaml
 
 # 部署frameworkcontroller
 
