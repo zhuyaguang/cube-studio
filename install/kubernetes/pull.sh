@@ -80,8 +80,6 @@ docker pull ai.tencentmusic.com/tme-public/gcr.io-ml-pipeline-mysql:5.6
 docker tag ai.tencentmusic.com/tme-public/gcr.io-ml-pipeline-mysql:5.6 gcr.io/ml-pipeline/mysql:5.6
 docker pull ai.tencentmusic.com/tme-public/mysql:5.7
 docker tag ai.tencentmusic.com/tme-public/mysql:5.7 mysql:5.7
-docker pull ai.tencentmusic.com/tme-public/mysql:8.0.26
-docker tag ai.tencentmusic.com/tme-public/mysql:8.0.26 mysql:8.0.26
 docker pull ai.tencentmusic.com/tme-public/tensorflow-serving:1.12.0
 docker tag ai.tencentmusic.com/tme-public/tensorflow-serving:1.12.0 tensorflow/serving:1.12.0
 docker pull ai.tencentmusic.com/tme-public/mysql:8

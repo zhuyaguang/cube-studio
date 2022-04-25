@@ -152,8 +152,6 @@ docker pull ai.tencentmusic.com/tme-public/gcr.io-knative-releases-knative.dev-s
 docker tag ai.tencentmusic.com/tme-public/gcr.io-knative-releases-knative.dev-serving-cmd-activator:ffa3d72ee6c2eeb2357999248191a643405288061b7080381f22875cb703e929 gcr.io/knative-releases/knative.dev/serving/cmd/activator:ffa3d72ee6c2eeb2357999248191a643405288061b7080381f22875cb703e929
 docker pull ai.tencentmusic.com/tme-public/mysql:5.7
 docker tag ai.tencentmusic.com/tme-public/mysql:5.7 mysql:5.7
-docker pull ai.tencentmusic.com/tme-public/mysql:8.0.26
-docker tag ai.tencentmusic.com/tme-public/mysql:8.0.26 mysql:8.0.26
 docker pull ai.tencentmusic.com/tme-public/gcr.io-kubeflow-images-public-tf_operator:vmaster-gda226016
 docker tag ai.tencentmusic.com/tme-public/gcr.io-kubeflow-images-public-tf_operator:vmaster-gda226016 gcr.io/kubeflow-images-public/tf_operator:vmaster-gda226016
 docker pull ai.tencentmusic.com/tme-public/gcr.io-kubeflow-images-public-kfam:vmaster-g9f3bfd00
