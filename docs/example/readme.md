@@ -105,42 +105,31 @@ __notebook__：开启一个jupyter-notebook，自动挂载个人工作目录。�
 #### ubuntu
 
 cuda10.2-cudnn7
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.2-cudnn7
-python3.7
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.2-cudnn7-python3.7
-python3.8
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.2-cudnn7-python3.8
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.2-cudnn7
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.2-cudnn7-python3.7
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.2-cudnn7-python3.8
 
 cuda10.1-cudnn7
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7
-python3.6
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.6
-python3.7
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.7
-python3.8
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.8
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.6
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.7
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.8
 
 cuda10.0-cudnn7
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.0-cudnn7
-python3.6
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.0-cudnn7-python3.6
-python3.7
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.0-cudnn7-python3.7
-python3.8
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.0-cudnn7-python3.8
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.0-cudnn7
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.0-cudnn7-python3.6
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.0-cudnn7-python3.7
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.0-cudnn7-python3.8
 
 cuda9.1-cudnn7
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda9.1-cudnn7
-python3.6
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda9.1-cudnn7-python3.6
-python3.7
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda9.1-cudnn7-python3.7
-python3.8
-● ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda9.1-cudnn7-python3.8
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda9.1-cudnn7
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda9.1-cudnn7-python3.6
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda9.1-cudnn7-python3.7
+- ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda9.1-cudnn7-python3.8
 
 
 cuda10.1-cuda10.0-cuda9.0-cudnn7.6
-● ai.tencentmusic.com/tme-public/gpu:ubuntu18.04-python3.6-cuda10.1-cuda10.0-cuda9.0-cudnn7.6-base
+- ai.tencentmusic.com/tme-public/gpu:ubuntu18.04-python3.6-cuda10.1-cuda10.0-cuda9.0-cudnn7.6-base
 
 
 # 配置/调试/定时运行pipeline
