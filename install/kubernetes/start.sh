@@ -161,7 +161,7 @@ ip=`ifconfig eth1 | grep 'inet '| awk '{print $2}' | head -n 1`
 kubectl patch svc istio-ingressgateway -n istio-system -p '{"spec":{"externalIPs":["'"${ip}"'"]}}'
 
 # 本地电脑手动host
-echo "打开网址：http://$node"
+echo "打开网址：http://xx.xx.xx.xx"
 
 
 
