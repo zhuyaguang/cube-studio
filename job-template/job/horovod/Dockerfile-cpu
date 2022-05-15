@@ -1,0 +1,32 @@
+
+# FROM horovod/horovod:0.20.0-tf2.3.0-torch1.6.0-mxnet1.5.0-py3.7-cpu
+FROM csighub.tencentyun.com/tme-kubeflow/mpi:horovod-cpu
+
+USER root
+RUN apt update && apt install -y --force-yes --no-install-recommends vim apt-transport-https gnupg2 ca-certificates-java rsync jq  wget git dnsutils iputils-ping net-tools curl mysql-client locales zip
+RUN apt install -y --force-yes --no-install-recommends locales ttf-wqy-microhei ttf-wqy-zenhei xfonts-wqy && locale-gen zh_CN && locale-gen zh_CN.utf8
+ENV LANG zh_CN.UTF-8
+ENV LC_ALL zh_CN.UTF-8
+ENV LANGUAGE zh_CN.UTF-8
+# 便捷操作
+RUN echo "alias ll='ls -alF'" >> /root/.bashrc && \
+    echo "alias la='ls -A'" >> /root/.bashrc && \
+    echo "alias vi='vim'" >> /root/.bashrc && \
+    /bin/bash -c "source /root/.bashrc"
+
+RUN pip install pysnooper dill requests kubernetes pysnooper
+ENV TZ 'Asia/Shanghai'
+COPY job/horovod /app
+
+#COPY job/pkgs/config/pip.conf /root/.pip/pip.conf
+#COPY job/pkgs/config/ubuntu-sources.list /etc/apt/sources.list
+
+WORKDIR /app
+ENTRYPOINT ["python", "start-cpu.py"]
+
+
+# docker run --name horovod -it --rm -v $PWD:/app csighub.tencentyun.com/tme-kubeflow/horovod:cpu-20210401 bash
+
+# nnictl create --config nni/examples/trials/mnist-pytorch/config_frameworkcontroller.yml -p 8888
+
+
