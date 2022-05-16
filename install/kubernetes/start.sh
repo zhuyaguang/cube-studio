@@ -52,6 +52,7 @@ kubectl apply -f ./grafana/grafana-datasources.yml
 kubectl apply -f ./grafana/grafana-admin-secret.yml
 kubectl apply -f ./grafana/grafana-svc.yml
 kubectl create configmap grafana-config --from-file=./grafana/grafana.ini --namespace=monitoring
+kubectl create configmap all-grafana-dashboards --from-file=./grafana/dashboard --namespace=monitoring
 kubectl apply -f ./grafana/grafana-dp.yml
 kubectl apply -f ./service-discovery/kube-controller-manager-svc.yml
 kubectl apply -f ./service-discovery/kube-scheduler-svc.yml
