@@ -92,7 +92,7 @@ spec:
         name: grafana-dashboards
       - configMap:
           name: all-grafana-dashboards
-        name: all-grafana-dashboardss
+        name: all-grafana-dashboards
       - configMap:
           name: grafana-config
           items:

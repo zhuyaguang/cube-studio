@@ -69,6 +69,7 @@ new_gpu = ['nvidia/k8s-device-plugin:v0.7.1', 'nvidia/dcgm-exporter:2.0.13-2.1.2
 new_prometheus = [
     'quay.io/prometheus/alertmanager:v0.15.0',
     'quay.io/prometheus-operator/prometheus-config-reloader:v0.46.0',
+    'quay.io/prometheus-operator/prometheus-config-reloader:v0.48.0',
     'quay.io/prometheus-operator/prometheus-config-reloader:v0.56.1',
     'quay.io/prometheus/prometheus:v2.3.1',
     "quay.io/prometheus/prometheus:v2.27.1",
