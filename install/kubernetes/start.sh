@@ -150,6 +150,8 @@ kubectl create -f pv-pvc-service.yaml
 
 kubectl apply -k cube/overlays
 
+kubectl wait crd/virtualservices.networking.istio.io --for condition=established --timeout=60s
+kubectl wait crd/gateways.networking.istio.io --for condition=established --timeout=60s
 
 kubectl apply -f gateway.yaml
 kubectl apply -f sa-rbac.yaml
