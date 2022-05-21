@@ -14699,6 +14699,12 @@ spec:
           - name: istio-certs
             mountPath: /etc/certs
             readOnly: true
+          - name: ingressgateway-certs
+            mountPath: "/etc/istio/ingressgateway-certs"
+            readOnly: true
+          - name: ingressgateway-ca-certs
+            mountPath: "/etc/istio/ingressgateway-ca-certs"
+            readOnly: true
       volumes:
       - name: istio-certs
         secret:
