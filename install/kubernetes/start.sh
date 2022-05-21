@@ -106,7 +106,7 @@ kubectl create clusterrolebinding frameworkbarrier-kubeflow --clusterrole=framew
 
 # 部署volcano
 kubectl apply -f volcano/volcano-development.yaml
-
+kubectl wait crd/jobs.batch.volcano.sh --for condition=established --timeout=60s
 
 # 部署kubeflow(训练框架+istio)
 kubectl apply -f kubeflow/v1.2.0/sa-rbac.yaml
@@ -160,11 +160,11 @@ kubectl apply -f virtual.yaml
 
 
 # 配置入口
-ip=`ifconfig eth1 | grep 'inet '| awk '{print $2}' | head -n 1`
-kubectl patch svc istio-ingressgateway -n istio-system -p '{"spec":{"externalIPs":["'"${ip}"'"]}}'
+#ip=`ifconfig eth1 | grep 'inet '| awk '{print $2}' | head -n 1`
+kubectl patch svc istio-ingressgateway -n istio-system -p '{"spec":{"externalIPs":["'"$1"'"]}}'
 
 # 本地电脑手动host
-echo "打开网址：http://xx.xx.xx.xx"
+echo "打开网址：http://$1"
 
 
 

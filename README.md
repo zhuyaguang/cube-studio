@@ -12,6 +12,45 @@ cube是tme开源的一站式云原生机器学习平台，目前主要包含
 
 有意向进行开源共建的同学请微信添加767065521并备注"Cube Studio开源共建"进入微信群.
 
+
+# 支持模板
+提示：
+- 1、能单机运行没必要多机运行  
+- 2、开发自定义模板，更符合自己业务线下的需求
+
+| 模板  | 类型 | 组件说明 | 文档地址 |
+| :----- | :---- | :---- |:---- |
+| 自定义镜像 | 单机 | 完全自定义单机运行环境，可自由实现所有自定义单机功能 | 系统自带 |
+| ray | 分布式 | python ray框架 多机分布式功能，适用于超多文件在多机上的并发处理 | job-template/job/ray |
+| ray-sklearn | 分布式 | 基于ray框架的sklearn支持算法多机分布式并行计算  | job-template/job/ray_sklearn |
+| volcano | 分布式 | volcano框架的多机分布式，可紫玉控制代码，利用环境变量实现多机worker的工作与协同  | job-template/job/volcano |
+| pytorchjob-train | 分布式 | 	pytorch的多机多卡分布式训练  | job-template/job/pytorch_distributed_train_k8s  |
+| media-download | 分布式 | 	分布式媒体文件下载  | job-template/job/video-audio |
+| video-audio | 分布式 | 	分布式视频提取音频  | job-template/job/video-audio |
+| video-img | 分布式 | 	分布式视频提取图片  | job-template/job/video-audio |
+| model-offline-predict | 分布式 | 	分布式模型离线推理  | job-template/job/model_offline_predict |
+| tfjob-train | 分布式 | tf分布式训练，内部支持plain和runner两种方式  | job-template/job/tf_distributed_train |
+| tfjob-runner | 分布式 | tf分布式-runner方式  | job-template/job/tf_distributed_train |
+| tfjob-plain | 分布式 | tf分布式-plain方式  | job-template/job/tf_plain_train |
+| tf-distribute-model-evaluation | 分布式 | tensorflow2.3分布式模型评估  | job-template/job/tf_model_evaluation |
+| tf-model-offline-predict | 分布式 | tf模型离线推理  | job-template/job/tf_model_offline_predict |
+| kaldi-distributed-on-volcanojob | 分布式 | kaldi音频分布式训练  | job-template/job/kaldi_distributed_on_volcanojob |
+
+
+# 平台部署
+
+参考install/README.md
+
+平台完成部署之后如下:
+
+<img width="100%" alt="167874734-5b1629e0-c3bb-41b0-871d-ffa43d914066" src="https://user-images.githubusercontent.com/20157705/168214806-b8aceb3d-e1b4-48f0-a079-903ef8751f40.png">
+
+# 相关视频
+
+[新人使用教程](https://www.bilibili.com/video/BV1zA4y1f7Rf)
+
+[job模板制作教程](https://www.bilibili.com/video/BV15B4y197nm)
+
 # 功能简述
 
 ### 整体架构
@@ -90,15 +129,6 @@ cube支持在线jupyterlab/theia(vscode)等功能，多用户，多实例，支�
 tmeps支持tf框架实时训练，秒级上线，能应对embedding稀疏大模型推荐场景
 
 ![image](https://user-images.githubusercontent.com/20157705/167534836-418855cf-daef-45a5-85c9-3bb1b7135f4f.png)
-
-# 平台部署
-
-参考install/README.md
-
-平台完成部署之后如下:
-
-<img width="100%" alt="167874734-5b1629e0-c3bb-41b0-871d-ffa43d914066" src="https://user-images.githubusercontent.com/20157705/168214806-b8aceb3d-e1b4-48f0-a079-903ef8751f40.png">
-
 
 
 
