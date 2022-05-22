@@ -228,7 +228,7 @@ def init():
                         "require": 1,
                         "choice": [],
                         "range": "",
-                        "default": "",
+                        "default": "/usr/local/datax/job/job.json",
                         "placeholder": "",
                         "describe": "job.json文件地址",
                         "editable": 1,
