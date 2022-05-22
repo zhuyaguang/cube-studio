@@ -1311,7 +1311,7 @@ def init():
             try:
                 service = Service()
                 service.name = service_name
-                service.describe=service_describe
+                service.label=service_describe
                 service.created_by_fk=1
                 service.changed_by_fk=1
                 service.project_id=project.id
@@ -1386,7 +1386,7 @@ def init():
             project_name='public',
             service_name='neo4j',
             service_describe='可视化编辑图数据库neo4j',
-            image_name='neo4j:4.4',
+            image_name='ai.tencentmusic.com/tme-public/neo4j:4.4',
             command='',
             env='''
             NEO4J_AUTH=neo4j/admin
