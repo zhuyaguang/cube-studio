@@ -161,7 +161,7 @@ def init():
                         "range": "",
                         "default": "ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.6",
                         "placeholder": "",
-                        "describe": "要调试的镜像，<a target='_blank' href='https://github.com/tencentmusic/cube-studio/tree/master/docs/example/images'>基础镜像参考<a>",
+                        "describe": "要调试的镜像，<a target='_blank' href='https://github.com/tencentmusic/cube-studio/tree/master/imagess'>基础镜像参考<a>",
                         "editable": 1,
                         "condition": "",
                         "sub_args": {}
@@ -1298,13 +1298,122 @@ def init():
 
 
 
+        #
+        # # 注册推理服务
+        # create_template(
+        #     repository_id=repository.id,
+        #     project_name='模型服务化',
+        #     image_name='ai.tencentmusic.com/tme-public/cube-service-deploy:latest',
+        #     image_describe='模型部署推理服务',
+        #     job_template_name='deploy-service',
+        #     job_template_describe='模型部署推理服务',
+        #     job_template_command='',
+        #     job_template_volume='',
+        #     job_template_account='',
+        #     job_template_env='',
+        #     job_template_expand={
+        #         "index": 6,
+        #         "help_url": "https://github.com/tencentmusic/cube-studio/tree/master/job-template/job/deploy-service"
+        #     },
+        #
+        #     job_template_args={
+        #         "shell": {
+        #             "--service_type": {
+        #                 "type": "str",
+        #                 "item_type": "str",
+        #                 "label": "模型服务类型",
+        #                 "require": 1,
+        #                 "choice": ['service','tfserving','torch-server','onnxruntime','triton-server'],
+        #                 "range": "",
+        #                 "default": "service",
+        #                 "placeholder": "",
+        #                 "describe": "模型服务类型",
+        #                 "editable": 1,
+        #                 "condition": "",
+        #                 "sub_args": {}
+        #             },
+        #             "--project_name": {
+        #                 "type": "str",
+        #                 "item_type": "str",
+        #                 "label": "项目组名称",
+        #                 "require": 0,
+        #                 "choice": [],
+        #                 "range": "",
+        #                 "default": "public",
+        #                 "placeholder": "",
+        #                 "describe": "项目组名称",
+        #                 "editable": 1,
+        #                 "condition": "",
+        #                 "sub_args": {}
+        #             },
+        #             "--model_name": {
+        #                 "type": "str",
+        #                 "item_type": "str",
+        #                 "label": "模型名",
+        #                 "require": 0,
+        #                 "choice": [],
+        #                 "range": "",
+        #                 "default": "",
+        #                 "placeholder": "",
+        #                 "describe": "模型名",
+        #                 "editable": 1,
+        #                 "condition": "",
+        #                 "sub_args": {}
+        #             },
+        #             "--model_version": {
+        #                 "type": "str",
+        #                 "item_type": "str",
+        #                 "label": "模型版本号",
+        #                 "require": 0,
+        #                 "choice": [],
+        #                 "range": "",
+        #                 "default": "",
+        #                 "placeholder": "",
+        #                 "describe": "模型版本号",
+        #                 "editable": 1,
+        #                 "condition": "",
+        #                 "sub_args": {}
+        #             },
+        #             "--images": {
+        #                 "type": "str",
+        #                 "item_type": "str",
+        #                 "label": "推理服务镜像",
+        #                 "require": 0,
+        #                 "choice": [],
+        #                 "range": "",
+        #                 "default": "",
+        #                 "placeholder": "",
+        #                 "describe": "推理服务镜像",
+        #                 "editable": 1,
+        #                 "condition": "",
+        #                 "sub_args": {}
+        #             },
+        #             "--model_path": {
+        #                 "type": "str",
+        #                 "item_type": "str",
+        #                 "label": "模型地址",
+        #                 "require": 0,
+        #                 "choice": [],
+        #                 "range": "",
+        #                 "default": "",
+        #                 "placeholder": "",
+        #                 "describe": "模型地址",
+        #                 "editable": 1,
+        #                 "condition": "",
+        #                 "sub_args": {}
+        #             }
+        #         }
+        #     }
+        # )
+
+
     except Exception as e:
         print(e)
 
 
 
     # 添加demo 服务
-    def create_service(project_name,service_name,service_describe,image_name,command,env,resource_mem='2G',resource_cpu='2',port='80'):
+    def create_service(project_name,service_name,service_describe,image_name,command,env,resource_mem='2G',resource_cpu='2',ports='80'):
         service = db.session.query(Service).filter_by(name=service_name).first()
         project = db.session.query(Project).filter_by(name=project_name).filter_by(type='org').first()
         if service is None and project:
@@ -1318,7 +1427,7 @@ def init():
                 service.images=image_name
                 service.command = command
                 service.env='\n'.join([x.strip() for x in env.split('\n') if x.split()])
-                service.port = port
+                service.ports = ports
                 db.session.add(service)
                 db.session.commit()
             except Exception as e:
@@ -1338,7 +1447,7 @@ def init():
             PMA_USER=root 
             PMA_PASSWORD=admin
             ''',
-            port='80'
+            ports='80'
         )
 
         # 部署redis-ui
@@ -1354,7 +1463,7 @@ def init():
             REDIS_PORT=6379
             REDIS_PASSWORD=admin
             ''',
-            port='7843'
+            ports='7843'
         )
 
         # 部署mongo ui
@@ -1377,7 +1486,7 @@ def init():
             VCAP_APP_PORT=8081
             ME_CONFIG_OPTIONS_EDITORTHEME=ambiance
             ''',
-            port='8081'
+            ports='8081'
         )
 
 
@@ -1391,7 +1500,7 @@ def init():
             env='''
             NEO4J_AUTH=neo4j/admin
             ''',
-            port='7474,7687'
+            ports='7474,7687'
         )
 
         # 部署jaeger链路追踪
@@ -1402,12 +1511,79 @@ def init():
             image_name='jaegertracing/all-in-one:1.29',
             command='',
             env='',
-            port='5775,16686'
+            ports='5775,16686'
         )
 
 
     except Exception as e:
         print(e)
+
+
+
+
+    # 创建demo pipeline
+    def create_pipeline(tasks,pipeline):
+
+        # 创建pipeline
+        pipeline_model = db.session.query(Pipeline).filter_by(name=pipeline['name']).first()
+        org_project = db.session.query(Project).filter_by(name=pipeline['project']).filter_by(type='org').first()
+        if pipeline_model is None and org_project:
+            try:
+                pipeline_model = Pipeline()
+                pipeline_model.name = pipeline['name']
+                pipeline_model.describe = pipeline['describe']
+                pipeline_model.dag_json=json.dumps(pipeline['dag_json'])
+                pipeline_model.created_by_fk = 1
+                pipeline_model.changed_by_fk = 1
+                pipeline_model.project_id = org_project.id
+                pipeline_model.expand = json.dumps(pipeline['expand'])
+                db.session.add(pipeline_model)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+
+        # 创建task
+        for task in tasks:
+            task_model = db.session.query(Task).filter_by(name=task['name']).filter_by(pipeline_id=pipeline_model.id).first()
+            job_template = db.session.query(Job_Template).filter_by(name=task['job_templete']).first()
+            if task_model is None and job_template:
+                try:
+                    task_model = Task()
+                    task_model.name = task['name']
+                    task_model.label = task['label']
+                    task_model.working_dir = task.get('working_dir','')
+                    task_model.command = task.get('command', '')
+                    task_model.args = json.dumps(task['args'])
+                    task_model.volume_mount = task['volume_mount']
+                    task_model.resource_memory = task['resource_memory']
+                    task_model.resource_cpu = task['resource_cpu']
+                    task_model.resource_gpu = task['resource_gpu']
+                    task_model.created_by_fk = 1
+                    task_model.changed_by_fk = 1
+                    task_model.pipeline_id = pipeline_model.id
+                    task_model.job_template_id = job_template.id
+                    db.session.add(task_model)
+                    db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
+
+
+    try:
+        pipeline={
+            "name":"imageAI",
+            "describe":"图像预测+物体检测+视频跟踪",
+            "dag_json":{},
+            "project":"public",
+            "expand":{
+                "demo":"true",
+                "img":"https://user-images.githubusercontent.com/20157705/170216784-91ac86f7-d272-4940-a285-0c27d6f6cd96.jpg"
+            }
+        }
+        tasks=[]
+        # create_pipeline(pipeline=pipeline,tasks=tasks)
+    except Exception as e:
+        print(e)
+
 
 @app.cli.command('init_db')
 @pysnooper.snoop()
