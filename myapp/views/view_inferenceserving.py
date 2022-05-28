@@ -130,7 +130,7 @@ class InferenceService_ModelView(MyappModelView):
             _(datamodel.obj.lab('sidecar')), default='',
             description='容器的agent代理',
             widget=Select2ManyWidget(),
-            choices=[['L5', 'L5'], ['DC', 'DC']]
+            choices=[]
         )
     }
 
@@ -287,7 +287,7 @@ class InferenceService_ModelView(MyappModelView):
 
 
         model_columns = ['service_type', 'project', 'label', 'model_name', 'model_version', 'images', 'model_path']
-        service_columns = ['resource_memory', 'resource_cpu','resource_gpu', 'min_replicas', 'max_replicas', 'hpa','canary','shadow','host','sidecar']
+        service_columns = ['resource_memory', 'resource_cpu','resource_gpu', 'min_replicas', 'max_replicas', 'hpa','canary','shadow','host']
         admin_columns = ['command','working_dir','env','ports','metrics','health','expand']
 
 

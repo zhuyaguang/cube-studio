@@ -1,8 +1,9 @@
+
 mkdir -p ~/.kube/ kubeconfig /data/k8s/kubeflow/pipeline/workspace /data/k8s/kubeflow/pipeline/archives
 cp config ~/.kube/config
 cp config kubeconfig/dev-kubeconfig
 
-node=`kubectl get node |grep worker | awk '{print $1}' | head -n 1`
+node=`kubectl  get node -o wide |grep $1 |awk '{print $1}'| head -n 1`
 kubectl label node $node train=true cpu=true notebook=true service=true org=public istio=true knative=true kubeflow=true kubeflow-dashboard=true mysql=true redis=true monitoring=true logging=true --overwrite
 # 拉取镜像
 sh pull_image_kubeflow.sh
@@ -105,12 +106,14 @@ kubectl create clusterrolebinding frameworkbarrier-kubeflow --clusterrole=framew
 
 
 # 部署volcano
+kubectl delete -f volcano/volcano-development.yaml
 kubectl apply -f volcano/volcano-development.yaml
 kubectl wait crd/jobs.batch.volcano.sh --for condition=established --timeout=60s
 
 # 部署kubeflow(训练框架+istio)
 kubectl apply -f kubeflow/v1.2.0/sa-rbac.yaml
-wget https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz && tar -zxvf kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
+#wget https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz && tar -zxvf kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
+wget https://docker-76009.sz.gfp.tencent-cloud.com/kubeflow/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz && tar -zxvf kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
 chmod +x kfctl
 mv kfctl /usr/bin/
 kfctl apply -V -f kubeflow/v1.2.0/kfctl_k8s_istio.v1.2.0.yaml
@@ -148,6 +151,7 @@ kubectl create -f pv-pvc-katib.yaml
 kubectl create -f pv-pvc-pipeline.yaml
 kubectl create -f pv-pvc-service.yaml
 
+kubectl delete -k cube/overlays
 kubectl apply -k cube/overlays
 
 kubectl wait crd/virtualservices.networking.istio.io --for condition=established --timeout=60s

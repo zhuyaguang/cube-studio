@@ -907,9 +907,9 @@ class K8s():
         cred_payload = {
             "auths": {
                 server: {
-                    "username": user,
-                    "password": password,
-                    "auth": base64.b64encode((user+":"+password).encode()).decode(),
+                    "Username": user,
+                    "Password": password,
+                    "Email": ''
                 }
             }
         }
