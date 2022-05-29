@@ -93,7 +93,7 @@ class InferenceService_ModelView_base():
     show_columns = ['service_type','project', 'name', 'label','model_name', 'model_version', 'images', 'model_path', 'input_html', 'output_html', 'images', 'volume_mount','working_dir', 'command', 'env', 'resource_memory',
                     'resource_cpu', 'resource_gpu', 'min_replicas', 'max_replicas', 'ports', 'inference_host_url','hpa', 'canary', 'shadow', 'health','model_status', 'expand_html','metrics_html','deploy_history' ]
 
-    list_columns = ['project','service_type','model_name_url','model_version','inference_host_url','model_status','creator','modified','operate_html']
+    list_columns = ['project','service_type','model_name_url','model_version','inference_host_url','ip','model_status','creator','modified','operate_html']
     edit_columns = add_columns
     label_title = '推理服务'
     base_order = ('id','desc')

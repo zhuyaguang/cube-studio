@@ -248,13 +248,26 @@ class InferenceService(Model,AuditMixinNullable,MyappModelBase,service_common):
     def clear(self):
         return Markup(f'<a href="/inferenceservice_modelview/clear/{self.id}">清理</a>')
 
+
+
     @property
     def ip(self):
+
+        # 优先使用项目组配置的代理ip
+        SERVICE_EXTERNAL_IP = json.loads(self.project.expand).get('SERVICE_EXTERNAL_IP',None) if self.project.expand else None
+        if SERVICE_EXTERNAL_IP:
+            host = SERVICE_EXTERNAL_IP+":"+str(20000+10*self.id)
+            return Markup(f'<a target=_blank href="http://{host}/">{host}</a>')
+
+        # 再使用全局配置代理ip
         SERVICE_EXTERNAL_IP = conf.get('SERVICE_EXTERNAL_IP',[])
+
         if SERVICE_EXTERNAL_IP:
             SERVICE_EXTERNAL_IP = SERVICE_EXTERNAL_IP[0]
-
-        return SERVICE_EXTERNAL_IP+":"+str(20000+10*self.id)
+            host = SERVICE_EXTERNAL_IP + ":" + str(20000 + 10 * self.id)
+            return Markup(f'<a target=_blank href="http://{host}/">{host}</a>')
+        else:
+            return "未开通"
 
     def __repr__(self):
         return self.name
