@@ -48,8 +48,10 @@ reset_docker.sh 是为了在机器从rancher集群踢出以后，把rancher环�
 
 # 部署k8s集群
 
-单节点部署rancher server
+单节点部署rancher server  
+
 ```bash
+# 需要拉取镜像
 python3 all_image.py > pull_rancher_images.sh
 sh pull_rancher_images.sh
 

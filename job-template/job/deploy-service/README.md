@@ -4,16 +4,128 @@
 ```bash
 {
     "shell": {
-        "--working_dir": {
+        "--project_name": {
             "type": "str",
             "item_type": "str",
-            "label": "启动目录",
+            "label": "部署项目名",
             "require": 1,
             "choice": [],
             "range": "",
-            "default": "/mnt/xx",
+            "default": "public",
             "placeholder": "",
-            "describe": "启动目录",
+            "describe": "部署项目名",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--service_type": {
+            "type": "str",
+            "item_type": "str",
+            "label": "推理服务类型",
+            "require": 0,
+            "choice": ['service','tfserving','torch-server','onnxruntime','triton-server'],
+            "range": "",
+            "default": "service",
+            "placeholder": "",
+            "describe": "推理服务类型",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--label": {
+            "type": "str",
+            "item_type": "str",
+            "label": "推理服务描述",
+            "require": 0,
+            "choice": [],
+            "range": "",
+            "default": "demo推理服务",
+            "placeholder": "",
+            "describe": "推理服务描述",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--model_name": {
+            "type": "str",
+            "item_type": "str",
+            "label": "模型名",
+            "require": 0,
+            "choice": [],
+            "range": "",
+            "default": "",
+            "placeholder": "",
+            "describe": "模型名",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--model_version": {
+            "type": "str",
+            "item_type": "str",
+            "label": "模型版本号",
+            "require": 0,
+            "choice": [],
+            "range": "",
+            "default": "v2022.10.01.1",
+            "placeholder": "",
+            "describe": "模型版本号",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--model_path": {
+            "type": "str",
+            "item_type": "str",
+            "label": "模型地址",
+            "require": 0,
+            "choice": [],
+            "range": "",
+            "default": "",
+            "placeholder": "",
+            "describe": "模型地址",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--images": {
+            "type": "str",
+            "item_type": "str",
+            "label": "推理服务镜像",
+            "require": 0,
+            "choice": [],
+            "range": "",
+            "default": "",
+            "placeholder": "",
+            "describe": "推理服务镜像",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--replicas": {
+            "type": "str",
+            "item_type": "str",
+            "label": "pod副本数",
+            "require": 0,
+            "choice": [],
+            "range": "",
+            "default": "1",
+            "placeholder": "",
+            "describe": "pod副本数",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--working_dir": {
+            "type": "str",
+            "item_type": "str",
+            "label": "推理容器工作目录",
+            "require": 0,
+            "choice": [],
+            "range": "",
+            "default": "",
+            "placeholder": "",
+            "describe": "推理容器工作目录",
             "editable": 1,
             "condition": "",
             "sub_args": {}
@@ -21,88 +133,60 @@
         "--command": {
             "type": "str",
             "item_type": "str",
-            "label": "启动命令",
-            "require": 1,
+            "label": "推理容器启动命令",
+            "require": 0,
             "choice": [],
             "range": "",
-            "default": "echo aa",
+            "default": "",
             "placeholder": "",
-            "describe": "启动命令",
+            "describe": "推理容器启动命令",
             "editable": 1,
             "condition": "",
             "sub_args": {}
         },
-        "--num_worker": {
+        "--args": {
             "type": "str",
             "item_type": "str",
-            "label": "占用机器个数",
-            "require": 1,
+            "label": "推理容器启动参数",
+            "require": 0,
             "choice": [],
             "range": "",
-            "default": "3",
+            "default": "",
             "placeholder": "",
-            "describe": "占用机器个数",
+            "describe": "推理容器启动参数",
             "editable": 1,
             "condition": "",
             "sub_args": {}
         },
-        "--image": {
-            "type": "str",
+        "--env": {
+            "type": "text",
             "item_type": "str",
-            "label": "",
-            "require": 1,
+            "label": "推理容器环境变量",
+            "require": 0,
             "choice": [],
             "range": "",
-            "default": "ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.6",
+            "default": "",
             "placeholder": "",
-            "describe": "worker镜像，直接运行你代码的环境镜像<a href='https://docs.qq.com/doc/DU0ptZEpiSmtMY1JT'>基础镜像</a>",
+            "describe": "推理容器环境变量",
             "editable": 1,
             "condition": "",
             "sub_args": {}
-        }
+        },
+        "--ports": {
+            "type": "str",
+            "item_type": "str",
+            "label": "推理容器暴露端口",
+            "require": 0,
+            "choice": [],
+            "range": "",
+            "default": "80",
+            "placeholder": "",
+            "describe": "推理容器暴露端口",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+
     }
 }
 ```
-
-# 用户代码示例
-
-保留单机的代码，添加识别集群信息的代码（多少个worker，当前worker是第几个），添加分工（只处理归属于当前worker的任务），
-
-完成。
-
-worker示例：
-```
-import time, datetime, json, requests, io, os
-from multiprocessing import Pool
-from functools import partial
-import os, random
-
-WORLD_SIZE = int(os.getenv('VC_WORKER_NUM', '1'))  # 总worker的数目
-RANK = int(os.getenv("VC_TASK_INDEX", '0'))     # 当前是第几个worker 从0开始
-
-print(WORLD_SIZE, RANK)
-
-
-# 子进程要执行的代码
-def task(key):
-    print('worker:',RANK,', task:',key,flush=True)
-    time.sleep(1)
-
-
-if __name__ == '__main__':
-
-    input = range(30000)    # 所有要处理的数据
-    local_task = []         # 当前worker需要处理的任务
-    for index in input:
-        if index%WORLD_SIZE==RANK:
-            local_task.append(index)     # 要处理的数据均匀分配到每个worker
-
-	    # 每个worker内部还可以用多进程，线程池之类的并发操作。
-    pool = Pool(10)  # 开辟包含指定数目线程的线程池
-    pool.map(partial(task), local_task)  # 当前worker，只处理分配给当前worker的任务
-    pool.close()
-    pool.join()
-```
-
-# 示例
-demo.py

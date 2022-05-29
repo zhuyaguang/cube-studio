@@ -143,7 +143,7 @@ class Service_ModelView_base():
     def delete_old_service(self,service_name,cluster):
         service_external_name = (service_name + "-external").lower()[:60].strip('-')
         from myapp.utils.py.py_k8s import K8s
-        k8s = K8s(cluster['KUBECONFIG'])
+        k8s = K8s(cluster.get('KUBECONFIG',''))
         namespace = conf.get('SERVICE_NAMESPACE')
         k8s.delete_deployment(namespace=namespace, name=service_name)
         k8s.delete_service(namespace=namespace, name=service_name)
@@ -179,7 +179,7 @@ class Service_ModelView_base():
 
         service = db.session.query(Service).filter_by(id=service_id).first()
         from myapp.utils.py.py_k8s import K8s
-        k8s_client = K8s(service.project.cluster['KUBECONFIG'])
+        k8s_client = K8s(service.project.cluster.get('KUBECONFIG',''))
         namespace = conf.get('SERVICE_NAMESPACE')
 
         volume_mount = service.volume_mount
