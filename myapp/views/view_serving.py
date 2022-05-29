@@ -84,7 +84,7 @@ class Service_Filter(MyappFilter):
         return query.filter(self.model.project_id.in_(join_projects_id))
 
 
-class Service_ModelView(MyappModelView):
+class Service_ModelView_base():
     datamodel = SQLAInterface(Service)
     help_url = conf.get('HELP_URL', {}).get(datamodel.obj.__tablename__, '') if datamodel else ''
     show_columns = ['name', 'label','images','volume_mount','working_dir','command','env','resource_memory','resource_cpu','resource_gpu','replicas','ports','host_url','link']
@@ -128,7 +128,7 @@ class Service_ModelView(MyappModelView):
                                                                   description='gpu的资源使用限制(core,memory)，示例:10,2（10%的单卡核数和2*256M的显存），其中core为小于100的整数或100的整数倍，表示占用的单卡的百分比例，memory为整数，表示n*256M的显存',
                                                                   widget=BS3TextFieldWidget())
     if gpu_type == 'NVIDIA':
-        add_form_extra_fields['resource_gpu'] = StringField(_(datamodel.obj.lab('resource_gpu')), default=0,
+        add_form_extra_fields['resource_gpu'] = StringField(_(datamodel.obj.lab('resource_gpu')), default='0',
                                                                   description='gpu的资源使用限制(单位卡)，示例:1，2，训练任务每个容器独占整卡',
                                                                   widget=BS3TextFieldWidget())
 
@@ -329,6 +329,13 @@ class Service_ModelView(MyappModelView):
         return self.render_template('link.html', data=data)
 
 
+class Service_ModelView(Service_ModelView_base,MyappModelView,DeleteMixin):
+    datamodel = SQLAInterface(Service)
 appbuilder.add_view(Service_ModelView,"内部服务",icon = 'fa-internet-explorer',category = '服务化')
 
 
+class Service_ModelView_Api(Service_ModelView_base,MyappModelRestApi):
+    datamodel = SQLAInterface(Service)
+    route_base = '/service_modelview/api'
+
+appbuilder.add_api(Service_ModelView_Api)
