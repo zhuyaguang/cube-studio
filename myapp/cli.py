@@ -591,13 +591,13 @@ def init():
                         "require": 1,
                         "choice": [],
                         "range": "",
-                        "default": json.dumps({
+                        "default": {
                             "max_depth":4,
                             "learning_rate":0.4,
                             "n_estimators":30,
                             "objective":"reg:linear",
                             "nthread":-1
-                        },indent=4,ensure_ascii=False),
+                        },
                         "placeholder": "",
                         "describe": "xgb参数, json格式",
                         "editable": 1,
@@ -1797,7 +1797,7 @@ def init():
                 pipeline_model.created_by_fk = 1
                 pipeline_model.changed_by_fk = 1
                 pipeline_model.project_id = org_project.id
-                pipeline_model.expand = json.dumps(pipeline['expand'])
+                pipeline_model.parameter = json.dumps(pipeline['parameter'])
                 db.session.add(pipeline_model)
                 db.session.commit()
             except Exception as e:
@@ -1835,13 +1835,13 @@ def init():
             "describe":"图像预测+物体检测+视频跟踪",
             "dag_json":{},
             "project":"public",
-            "expand":{
+            "parameter":{
                 "demo":"true",
                 "img":"https://user-images.githubusercontent.com/20157705/170216784-91ac86f7-d272-4940-a285-0c27d6f6cd96.jpg"
             }
         }
         tasks=[]
-        # create_pipeline(pipeline=pipeline,tasks=tasks)
+        create_pipeline(pipeline=pipeline,tasks=tasks)
     except Exception as e:
         print(e)
 
