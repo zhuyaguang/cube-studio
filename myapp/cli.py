@@ -101,26 +101,47 @@ def init():
 
         job_template = db.session.query(Job_Template).filter_by(name=job_template_name).first()
         project = db.session.query(Project).filter_by(name=project_name).filter_by(type='job-template').first()
-        if job_template is None and project and images.id:
-            try:
-                job_template = Job_Template()
-                job_template.name = job_template_name
-                job_template.describe=job_template_describe
-                job_template.entrypoint=job_template_command,
-                job_template.volume_mount=job_template_volume,
-                job_template.accounts=job_template_account,
-                job_template.expand = json.dumps(job_template_expand,indent=4,ensure_ascii=False) if job_template_expand else '{}'
-                job_template.created_by_fk=1
-                job_template.changed_by_fk=1
-                job_template.project_id=project.id
-                job_template.images_id=images.id
-                job_template.version='Release'
-                job_template.env=job_template_env
-                job_template.args=json.dumps(job_template_args,indent=4,ensure_ascii=False) if job_template_args else '{}'
-                db.session.add(job_template)
-                db.session.commit()
-            except Exception as e:
-                db.session.rollback()
+        if project and images.id:
+            if job_template is None:
+                try:
+                    job_template = Job_Template()
+                    job_template.name = job_template_name
+                    job_template.describe=job_template_describe
+                    job_template.entrypoint=job_template_command,
+                    job_template.volume_mount=job_template_volume,
+                    job_template.accounts=job_template_account,
+                    job_template.expand = json.dumps(job_template_expand,indent=4,ensure_ascii=False) if job_template_expand else '{}'
+                    job_template.created_by_fk=1
+                    job_template.changed_by_fk=1
+                    job_template.project_id=project.id
+                    job_template.images_id=images.id
+                    job_template.version='Release'
+                    job_template.env=job_template_env
+                    job_template.args=json.dumps(job_template_args,indent=4,ensure_ascii=False) if job_template_args else '{}'
+                    db.session.add(job_template)
+                    db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
+            else:
+                try:
+                    job_template.describe = job_template_describe
+                    job_template.entrypoint = job_template_command,
+                    job_template.volume_mount = job_template_volume,
+                    job_template.accounts = job_template_account,
+                    job_template.expand = json.dumps(job_template_expand, indent=4,ensure_ascii=False) if job_template_expand else '{}'
+                    job_template.created_by_fk = 1
+                    job_template.changed_by_fk = 1
+                    job_template.project_id = project.id
+                    job_template.images_id = images.id
+                    job_template.version = 'Release'
+                    job_template.env = job_template_env
+                    job_template.args = json.dumps(job_template_args, indent=4,
+                                                   ensure_ascii=False) if job_template_args else '{}'
+                    db.session.update(job_template)
+                    db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
+
 
 
 
@@ -151,7 +172,7 @@ def init():
             job_template_name=conf.get('CUSTOMIZE_JOB','自定义镜像') if conf.get('CUSTOMIZE_JOB','自定义镜像') else '自定义镜像',
             job_template_describe='使用用户自定义镜像作为运行镜像',
             job_template_args={
-                "shell": {
+                "参数": {
                     "images": {
                         "type": "str",
                         "item_type": "str",
@@ -220,11 +241,11 @@ def init():
             },
 
             job_template_args={
-                "shell": {
+                "参数": {
                     "-f": {
                         "type": "str",
                         "item_type": "str",
-                        "label": "job.json文件地址",
+                        "label": "job.json文件地址，<a href='https://github.com/alibaba/DataX'>书写格式参考</a>",
                         "require": 1,
                         "choice": [],
                         "range": "",
@@ -260,7 +281,7 @@ def init():
             TASK_RESOURCE_GPU=0
             '''.strip().replace(' ',''),
             job_template_args={
-                "shell": {
+                "参数": {
                     "--image": {
                         "type": "str",
                         "item_type": "str",
@@ -341,7 +362,7 @@ def init():
                 "help_url": "https://github.com/tencentmusic/cube-studio/tree/master/job-template/job/ray"
             },
             job_template_args={
-                "shell": {
+                "参数": {
                     "-n": {
                         "type": "int",
                         "item_type": "",
@@ -411,7 +432,7 @@ def init():
             },
 
             job_template_args={
-                "shell": {
+                "参数": {
                     "--train_csv_file_path": {
                         "type": "str",
                         "item_type": "str",
@@ -721,7 +742,7 @@ def init():
             },
 
             job_template_args={
-                "shell": {
+                "参数": {
                     "--job": {
                         "type": "json",
                         "item_type": "str",
@@ -778,7 +799,7 @@ def init():
             },
 
             job_template_args={
-                "shell": {
+                "参数": {
                     "--job": {
                         "type": "json",
                         "item_type": "str",
@@ -837,7 +858,7 @@ def init():
             },
 
             job_template_args={
-                "shell": {
+                "参数": {
                     "--job": {
                         "type": "json",
                         "item_type": "str",
@@ -893,7 +914,7 @@ def init():
             },
 
             job_template_args={
-                "shell": {
+                "参数": {
                     "--job": {
                         "type": "json",
                         "item_type": "str",
@@ -949,7 +970,7 @@ def init():
             },
 
             job_template_args={
-                "shell": {
+                "参数": {
                     "--job": {
                         "type": "json",
                         "item_type": "str",
@@ -1001,7 +1022,7 @@ def init():
             },
 
             job_template_args={
-                "shell": {
+                "参数": {
                     "--job": {
                         "type": "json",
                         "item_type": "str",
@@ -1060,7 +1081,7 @@ def init():
             },
 
             job_template_args={
-                "shell": {
+                "参数": {
                     "--image": {
                         "type": "str",
                         "item_type": "str",
@@ -1140,7 +1161,7 @@ def init():
                 "help_url": "https://github.com/tencentmusic/cube-studio/tree/master/job-template/job/video-audio"
             },
             job_template_args={
-                "shell": {
+                "参数": {
                     "--num_worker": {
                         "type": "str",
                         "item_type": "str",
@@ -1206,7 +1227,7 @@ def init():
                 "help_url": "https://github.com/tencentmusic/cube-studio/tree/master/job-template/job/video-audio"
             },
             job_template_args={
-                "shell": {
+                "参数": {
                     "--num_workers": {
                         "type": "str",
                         "item_type": "str",
@@ -1256,7 +1277,7 @@ def init():
                 "help_url": "https://github.com/tencentmusic/cube-studio/tree/master/job-template/job/video-audio"
             },
             job_template_args={
-                "shell": {
+                "参数": {
                     "--num_workers": {
                         "type": "str",
                         "item_type": "str",
@@ -1317,7 +1338,7 @@ def init():
             },
 
             job_template_args={
-                "shell": {
+                "参数": {
                     "--working_dir": {
                         "type": "str",
                         "item_type": "str",
@@ -1401,7 +1422,7 @@ def init():
             },
 
             job_template_args={
-                "shell": {
+                "参数": {
                     "--image": {
                         "type": "str",
                         "item_type": "str",
@@ -1793,20 +1814,21 @@ def init():
         # 创建pipeline
         pipeline_model = db.session.query(Pipeline).filter_by(name=pipeline['name']).first()
         org_project = db.session.query(Project).filter_by(name=pipeline['project']).filter_by(type='org').first()
-        if pipeline_model is None and org_project:
-            try:
-                pipeline_model = Pipeline()
-                pipeline_model.name = pipeline['name']
-                pipeline_model.describe = pipeline['describe']
-                pipeline_model.dag_json=json.dumps(pipeline['dag_json'])
-                pipeline_model.created_by_fk = 1
-                pipeline_model.changed_by_fk = 1
-                pipeline_model.project_id = org_project.id
-                pipeline_model.parameter = json.dumps(pipeline['parameter'])
-                db.session.add(pipeline_model)
-                db.session.commit()
-            except Exception as e:
-                db.session.rollback()
+        if org_project:
+            if pipeline_model is None:
+                try:
+                    pipeline_model = Pipeline()
+                    pipeline_model.name = pipeline['name']
+                    pipeline_model.describe = pipeline['describe']
+                    pipeline_model.dag_json=json.dumps(pipeline['dag_json'])
+                    pipeline_model.created_by_fk = 1
+                    pipeline_model.changed_by_fk = 1
+                    pipeline_model.project_id = org_project.id
+                    pipeline_model.parameter = json.dumps(pipeline['parameter'])
+                    db.session.add(pipeline_model)
+                    db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
 
         # 创建task
         for task in tasks:
