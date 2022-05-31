@@ -230,7 +230,7 @@ def init():
                         "range": "",
                         "default": "/usr/local/datax/job/job.json",
                         "placeholder": "",
-                        "describe": "job.json文件地址",
+                        "describe": "job.json文件地址，<a href='https://github.com/alibaba/DataX'>书写格式参考</a>",
                         "editable": 1,
                         "condition": "",
                         "sub_args": {}
@@ -261,6 +261,20 @@ def init():
             '''.strip().replace(' ',''),
             job_template_args={
                 "shell": {
+                    "--image": {
+                        "type": "str",
+                        "item_type": "str",
+                        "label": "",
+                        "require": 1,
+                        "choice": [],
+                        "range": "",
+                        "default": "ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.6",
+                        "placeholder": "",
+                        "describe": "worker镜像，直接运行你代码的环境镜像<a href='https://github.com/tencentmusic/cube-studio/tree/master/images'>基础镜像</a>",
+                        "editable": 1,
+                        "condition": "",
+                        "sub_args": {}
+                    },
                     "--working_dir": {
                         "type": "str",
                         "item_type": "str",
@@ -303,20 +317,7 @@ def init():
                         "condition": "",
                         "sub_args": {}
                     },
-                    "--image": {
-                        "type": "str",
-                        "item_type": "str",
-                        "label": "",
-                        "require": 1,
-                        "choice": [],
-                        "range": "",
-                        "default": "ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.6",
-                        "placeholder": "",
-                        "describe": "worker镜像，直接运行你代码的环境镜像<a href='https://github.com/tencentmusic/cube-studio/tree/master/images'>基础镜像</a>",
-                        "editable": 1,
-                        "condition": "",
-                        "sub_args": {}
-                    }
+
                 }
             }
 
@@ -549,6 +550,20 @@ def init():
 
             job_template_args={
                 "训练": {
+                    "--train_csv_file_path": {
+                        "type": "text",
+                        "item_type": "",
+                        "label": "训练集csv路径",
+                        "require": 1,
+                        "choice": [],
+                        "range": "",
+                        "default": "/app/train.csv",
+                        "placeholder": "",
+                        "describe": "训练集csv路径，首行是header，首列是label。为空则不做训练，尝试从model_load_path加载模型。",
+                        "editable": 1,
+                        "condition": "",
+                        "sub_args": {}
+                    },
                     "--sep": {
                         "type": "str",
                         "item_type": "",
@@ -600,20 +615,6 @@ def init():
                         },
                         "placeholder": "",
                         "describe": "xgb参数, json格式",
-                        "editable": 1,
-                        "condition": "",
-                        "sub_args": {}
-                    },
-                    "--train_csv_file_path": {
-                        "type": "text",
-                        "item_type": "",
-                        "label": "训练集csv路径",
-                        "require": 1,
-                        "choice": [],
-                        "range": "",
-                        "default": "/app/train.csv",
-                        "placeholder": "",
-                        "describe": "训练集csv路径，首行是header，首列是label。为空则不做训练，尝试从model_load_path加载模型。",
                         "editable": 1,
                         "condition": "",
                         "sub_args": {}
@@ -1401,6 +1402,20 @@ def init():
 
             job_template_args={
                 "shell": {
+                    "--image": {
+                        "type": "str",
+                        "item_type": "str",
+                        "label": "",
+                        "require": 1,
+                        "choice": [],
+                        "range": "",
+                        "default": "ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.6",
+                        "placeholder": "",
+                        "describe": "worker镜像，直接运行你代码的环境镜像<a href='https://github.com/tencentmusic/cube-studio/tree/master/images'>基础镜像</a>",
+                        "editable": 1,
+                        "condition": "",
+                        "sub_args": {}
+                    },
                     "--working_dir": {
                         "type": "str",
                         "item_type": "str",
@@ -1443,20 +1458,7 @@ def init():
                         "condition": "",
                         "sub_args": {}
                     },
-                    "--image": {
-                        "type": "str",
-                        "item_type": "str",
-                        "label": "",
-                        "require": 1,
-                        "choice": [],
-                        "range": "",
-                        "default": "ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.6",
-                        "placeholder": "",
-                        "describe": "worker镜像，直接运行你代码的环境镜像<a href='https://github.com/tencentmusic/cube-studio/tree/master/images'>基础镜像</a>",
-                        "editable": 1,
-                        "condition": "",
-                        "sub_args": {}
-                    }
+
                 }
             }
         )
@@ -1479,39 +1481,11 @@ def init():
             },
 
             job_template_args={
-                "shell": {
-                    "--project_name": {
-                        "type": "str",
-                        "item_type": "str",
-                        "label": "部署项目名",
-                        "require": 1,
-                        "choice": [],
-                        "range": "",
-                        "default": "public",
-                        "placeholder": "",
-                        "describe": "部署项目名",
-                        "editable": 1,
-                        "condition": "",
-                        "sub_args": {}
-                    },
-                    "--service_type": {
-                        "type": "str",
-                        "item_type": "str",
-                        "label": "推理服务类型",
-                        "require": 0,
-                        "choice": ['service','tfserving','torch-server','onnxruntime','triton-server'],
-                        "range": "",
-                        "default": "service",
-                        "placeholder": "",
-                        "describe": "推理服务类型",
-                        "editable": 1,
-                        "condition": "",
-                        "sub_args": {}
-                    },
+                "模型信息": {
                     "--label": {
                         "type": "str",
                         "item_type": "str",
-                        "label": "推理服务描述",
+                        "label": "中文描述描述",
                         "require": 0,
                         "choice": [],
                         "range": "",
@@ -1563,6 +1537,36 @@ def init():
                         "editable": 1,
                         "condition": "",
                         "sub_args": {}
+                    }
+                },
+                "部署信息":{
+                    "--project_name": {
+                        "type": "str",
+                        "item_type": "str",
+                        "label": "部署项目名",
+                        "require": 1,
+                        "choice": [],
+                        "range": "",
+                        "default": "public",
+                        "placeholder": "",
+                        "describe": "部署项目名",
+                        "editable": 1,
+                        "condition": "",
+                        "sub_args": {}
+                    },
+                    "--service_type": {
+                        "type": "str",
+                        "item_type": "str",
+                        "label": "推理服务类型",
+                        "require": 0,
+                        "choice": ['service', 'tfserving', 'torch-server', 'onnxruntime', 'triton-server'],
+                        "range": "",
+                        "default": "service",
+                        "placeholder": "",
+                        "describe": "推理服务类型",
+                        "editable": 1,
+                        "condition": "",
+                        "sub_args": {}
                     },
                     "--images": {
                         "type": "str",
@@ -1578,20 +1582,7 @@ def init():
                         "condition": "",
                         "sub_args": {}
                     },
-                    "--replicas": {
-                        "type": "str",
-                        "item_type": "str",
-                        "label": "pod副本数",
-                        "require": 0,
-                        "choice": [],
-                        "range": "",
-                        "default": "1",
-                        "placeholder": "",
-                        "describe": "pod副本数",
-                        "editable": 1,
-                        "condition": "",
-                        "sub_args": {}
-                    },
+
                     "--working_dir": {
                         "type": "str",
                         "item_type": "str",
@@ -1658,6 +1649,20 @@ def init():
                         "default": "80",
                         "placeholder": "",
                         "describe": "推理容器暴露端口",
+                        "editable": 1,
+                        "condition": "",
+                        "sub_args": {}
+                    },
+                    "--replicas": {
+                        "type": "str",
+                        "item_type": "str",
+                        "label": "pod副本数",
+                        "require": 0,
+                        "choice": [],
+                        "range": "",
+                        "default": "1",
+                        "placeholder": "",
+                        "describe": "pod副本数",
                         "editable": 1,
                         "condition": "",
                         "sub_args": {}
