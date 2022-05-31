@@ -160,9 +160,12 @@
         <input class="button ml100 pass-btn" type="button" id="btn-pass" value="检测">
         </div>
         <div id="models">
-            <label><input type="checkbox" id="face-det" name="models" value="face_det"  style="margin-left: 5em">人脸检测</label>
-            <label><input type="checkbox" id="human-det" name="models"   value="human_det" style="margin-left: 5em">人体检测</label>
-            <label><input type="checkbox" id="bike-det"  name="models"  value="bike_det" style="margin-left: 5em">自行车检测</label>
+            <label><input type="checkbox" id="object-det" name="models" value="object-det"  style="margin-left: 5em"> 物品检测</label>
+            <label><input type="checkbox" id="animal-recognition"  name="models"  value="animal-recognition" style="margin-left: 5em"> 目标识别</label>
+            <label><input type="checkbox" id="image-classification"  name="models"  value="image-classification" style="margin-left: 5em"> 图像分类</label>
+            <label><input type="checkbox" id="image-seg"  name="models"  value="image-seg" style="margin-left: 5em"> 图像分割</label>
+            <label><input type="checkbox" id="feast-extract"  name="models"  value="feast-extract" style="margin-left: 5em"> 特征提取</label>
+            <label><input type="checkbox" id="video-tracking"  name="models"  value="image-tracking" style="margin-left: 5em"> 视频跟踪</label>
         </div>
 
     </div>
@@ -175,7 +178,7 @@
 
     var host = location.host;
     console.log(host);
-    backend_server = "http://"+host+'/test/v1.0/arctern';
+    backend_server = "http://"+host+'/api/v1.0/model';
 
     var cn = 'img-block';
     var ic = 'img-checked';  //图片被选中时的样式
