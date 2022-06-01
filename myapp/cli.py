@@ -1810,25 +1810,32 @@ def init():
 
     # 创建demo pipeline
     def create_pipeline(tasks,pipeline):
+        # 如果项目组或者task的模板不存在就丢失
+        org_project = db.session.query(Project).filter_by(name=pipeline['project']).filter_by(type='org').first()
+        if not org_project:
+            return
+        for task in tasks:
+            job_template = db.session.query(Job_Template).filter_by(name=task['job_templete']).first()
+            if not job_template:
+                return
+
 
         # 创建pipeline
         pipeline_model = db.session.query(Pipeline).filter_by(name=pipeline['name']).first()
-        org_project = db.session.query(Project).filter_by(name=pipeline['project']).filter_by(type='org').first()
-        if org_project:
-            if pipeline_model is None:
-                try:
-                    pipeline_model = Pipeline()
-                    pipeline_model.name = pipeline['name']
-                    pipeline_model.describe = pipeline['describe']
-                    pipeline_model.dag_json=json.dumps(pipeline['dag_json'])
-                    pipeline_model.created_by_fk = 1
-                    pipeline_model.changed_by_fk = 1
-                    pipeline_model.project_id = org_project.id
-                    pipeline_model.parameter = json.dumps(pipeline['parameter'])
-                    db.session.add(pipeline_model)
-                    db.session.commit()
-                except Exception as e:
-                    db.session.rollback()
+        if pipeline_model is None:
+            try:
+                pipeline_model = Pipeline()
+                pipeline_model.name = pipeline['name']
+                pipeline_model.describe = pipeline['describe']
+                pipeline_model.dag_json=json.dumps(pipeline['dag_json'])
+                pipeline_model.created_by_fk = 1
+                pipeline_model.changed_by_fk = 1
+                pipeline_model.project_id = org_project.id
+                pipeline_model.parameter = json.dumps(pipeline['parameter'])
+                db.session.add(pipeline_model)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
 
         # 创建task
         for task in tasks:
@@ -1839,8 +1846,6 @@ def init():
                     task_model = Task()
                     task_model.name = task['name']
                     task_model.label = task['label']
-                    task_model.working_dir = task.get('working_dir','')
-                    task_model.command = task.get('command', '')
                     task_model.args = json.dumps(task['args'])
                     task_model.volume_mount = task['volume_mount']
                     task_model.resource_memory = task['resource_memory']
@@ -1857,6 +1862,7 @@ def init():
 
 
     try:
+
         pipeline={
             "name":"imageAI",
             "describe":"图像预测+物体检测+视频跟踪",
@@ -1867,7 +1873,52 @@ def init():
                 "img":"https://user-images.githubusercontent.com/20157705/170216784-91ac86f7-d272-4940-a285-0c27d6f6cd96.jpg"
             }
         }
-        tasks=[]
+        tasks=[
+            {
+                "job_templete":"自定义镜像",
+                "name":"download_data",
+                "label":"下载标注数据",
+                "args":{
+                    {
+                        "images": "ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.6",
+                        "workdir": "/mnt/admin/",
+                        "command": "wegt"
+                    }
+                }
+            },
+            {
+                "job_templete": "darknet",
+                "name": "yolov3-object-recognition",
+                "label": "目标识别训练",
+                "args": {
+                    {
+                        "config": "ai.tencentmusic.com/tme-public/ubuntu-gpu:cuda10.1-cudnn7-python3.6"
+                    }
+                }
+            },
+            {
+                "job_templete": "deploy-service",
+                "name": "deploy-darknet-web-service",
+                "label": "部署模型web服务",
+                "args": {
+                    {
+                        "--label": "目标识别推理服务",
+                        "--model_name": "yolov3",
+                        "--model_version": "v2022.10.01.1",
+                        "--model_path": "",
+                        "--project_name": "public",
+                        "--service_type": "service",
+                        "--images": "ai.tencentmusic.com/tme-public/target-detection",
+                        "--working_dir": "",
+                        "--command": "",
+                        "--args": "",
+                        "--env": "YOLO_BASE_DIR=/app/yolo",
+                        "--ports": "8080",
+                        "--replicas": "1"
+                    }
+                }
+            }
+        ]
         create_pipeline(pipeline=pipeline,tasks=tasks)
     except Exception as e:
         print(e)

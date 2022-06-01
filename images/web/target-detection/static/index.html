@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
-    <title>arctern dashboard</title>
+    <title>image dashboard</title>
     <link href="nprogress.css" rel="stylesheet" />
     <style>
         *{margin:0;padding:0;}
@@ -269,12 +269,12 @@
         console.log(local_path)
     }
 
-    image_load_type=0;     //默认爬虫获取图片后鉴黄
+    image_load_type=0;     //默认爬虫获取图片
 
     //选择图片，马上预览
     function open_img(obj) {
         alllocalimg=[];    //清空之前的数据
-        image_load_type=1;    // 设置鉴黄类型为图片鉴黄
+        image_load_type=1;
         document.getElementById("container").innerHTML="";
         var fl=obj.files.length;
         for(let i=0;i<fl;i++){
@@ -334,18 +334,21 @@
             if (alllocalimg.length==0){
                 alert('请至少包含一个图片！');
                 return false;
-            };
+            }
             NProgress.start();  //进度条启动
 
             console.log('图片个数'+alllocalimg.length);
-            for(var i=0;i<alllocalimg.length;i++)
+            for(let i=0;i<alllocalimg.length;i++)
+            {
                 send_pic(i);   //从鉴别第一张开始
-            // send_pic(0);   //从鉴别第一张开始
+                // send_pic(0);   //从鉴别第一张开始
+            }
+
         }
         //单次发送一张图片
         function send_pic(iii) {
             local_img=alllocalimg[iii];
-            console.log(local_img)
+            console.log(local_img);
 
             var models = [];
             $("[name = models]:checkbox").each(function () {
@@ -376,7 +379,7 @@
 
             $.ajax({
                 type: "POST",     //post方式
-                url: arcternserver,   //请求网址
+                url: backend_server,   //请求网址
                 data: JSON.stringify(formdata),  //数据内容
                 dataType: 'json',
                 crossDomain: true,
@@ -387,45 +390,16 @@
                     // console.log(JSON.stringify(back));
                     if(back['status']==0)    //每张图片的处理状态值
                     {
-                        img_result = back['result'];  //当前图片的处理结果。Sexual和Porn两个分量
-                        console.log(JSON.stringify(img_result));
-                        result_str="";
-                        for(attr in img_result){
-                            if(attr=='image_id'){continue}
-                            if(img_result[attr]['status']==0){
-                                for(res in img_result[attr]['result'])
-                                {
-                                    if(res=='image_id'){
-                                        continue
-                                    }
-                                    if(res=='det' && attr!='face_det')
-                                        continue
-                                    else{
-                                        result_str+=attr+":["+img_result[attr]['result'][res]+"]</br>"
-                                    }
-                                }
-                            }else {
-                                result_str+=attr+":检测失败\n"
-                            }
-                        }
-                        img_dom=$("div[dataid='"+image_id+"']");
-                        img_dom.children('p').html(result_str)
-                        // Sexual=parseInt(img_result['Sexual']);
-                        // Porn =parseInt(img_result['Porn']);
-                        // color=allcolor[0];
-                        // if(Sexual>Porn)
-                        //     color = allcolor[Sexual];
-                        // else
-                        //     color = allcolor[Porn];
-                        // console.log(image_id)
-                        // img_dom=$("div[dataid='"+image_id+"']");
-                        // // console.log(img_dom)
-                        // img_dom.css('background-color',color);
-                        // img_dom.children('p').text('sexual:'+Sexual+'，porn:'+Porn)
+                        result = back['result'];  //当前图片的处理结果。
+                        console.log(JSON.stringify(back));
+                        div_dom=$("div[dataid='"+image_id+"']");
+                        img_dom=div_dom.children('img')[0];
+                        img_dom.setAttribute('src','data:.*;base64,'+result[image_id]);
+                        div_dom.children('p').html('检测成功')
 
                     }else {
-                        img_dom=$("div[dataid='"+image_id+"']");
-                        img_dom.children('p').html('检测失败:'+back['message'])
+                        div_dom=$("div[dataid='"+image_id+"']");
+                        div_dom.children('p').html('检测失败')
                     }
 
                 },
