@@ -249,7 +249,7 @@ def init():
                     task_model.name = task['name'].replace('_','-')
                     task_model.label = task['label']
                     task_model.args = json.dumps(task['args'])
-                    task_model.volume_mount = task['volume_mount']
+                    task_model.volume_mount = task.get('volume_mount','')
                     task_model.resource_memory = task['resource_memory']
                     task_model.resource_cpu = task['resource_cpu']
                     task_model.resource_gpu = task['resource_gpu']

@@ -11,14 +11,14 @@ services:
   myapp:
     image:  ai.tencentmusic.com/tme-public/kubeflow-dashboard:2022.05.01
     restart: unless-stopped
-    command: ['bash','-c','/entrypoint.sh']   # 生产模式
+    command: ['bash','-c','sleep 10000000 && /entrypoint.sh']   # 生产模式
     environment:
       STAGE: 'dev'
       REDIS_HOST: 'host.docker.internal'
       REDIS_PORT: '6379'
       REDIS_PASSWORD: admin
       HOST: 127.0.0.1
-      MYSQL_SERVICE: 'mysql+pymysql://root:admin@host.docker.internal:3306/kubeflow?charset=utf8'
+      MYSQL_SERVICE: 'mysql+pymysql://root:admin@host.docker.internal:3306/cube?charset=utf8'
       ENVIRONMENT: DEV
       GPU_TYPE: NVIDIA
 
