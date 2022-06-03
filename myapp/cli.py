@@ -27,7 +27,7 @@ import pysnooper
 
 # https://dormousehole.readthedocs.io/en/latest/cli.html
 @app.cli.command('init')
-@pysnooper.snoop()
+# @pysnooper.snoop()
 def init():
 
     # 初始化创建项目组
@@ -79,7 +79,7 @@ def init():
     except Exception as e:
         print(e)
 
-    @pysnooper.snoop()
+    # @pysnooper.snoop()
     def create_template(repository_id,project_name,image_name,image_describe,job_template_name,job_template_describe='',job_template_command='',job_template_args=None,job_template_volume='',job_template_account='',job_template_expand=None,job_template_env=''):
         if not repository_id:
             return
@@ -136,9 +136,7 @@ def init():
                     job_template.images_id = images.id
                     job_template.version = 'Release'
                     job_template.env = job_template_env
-                    job_template.args = json.dumps(job_template_args, indent=4,
-                                                   ensure_ascii=False) if job_template_args else '{}'
-                    db.session.update(job_template)
+                    job_template.args = json.dumps(job_template_args, indent=4,ensure_ascii=False) if job_template_args else '{}'
                     db.session.commit()
                 except Exception as e:
                     db.session.rollback()
@@ -176,7 +174,7 @@ def init():
 
 
     # 添加demo 服务
-    @pysnooper.snoop()
+    # @pysnooper.snoop()
     def create_service(project_name,service_name,service_describe,image_name,command,env,resource_mem='2G',resource_cpu='2',ports='80'):
         service = db.session.query(Service).filter_by(name=service_name).first()
         project = db.session.query(Project).filter_by(name=project_name).filter_by(type='org').first()
@@ -210,7 +208,7 @@ def init():
 
 
     # 创建demo pipeline
-    @pysnooper.snoop()
+    # @pysnooper.snoop()
     def create_pipeline(tasks,pipeline):
         # 如果项目组或者task的模板不存在就丢失
         org_project = db.session.query(Project).filter_by(name=pipeline['project']).filter_by(type='org').first()
@@ -229,15 +227,24 @@ def init():
                 pipeline_model = Pipeline()
                 pipeline_model.name = pipeline['name']
                 pipeline_model.describe = pipeline['describe']
-                pipeline_model.dag_json=json.dumps(pipeline['dag_json']).replace('_','-')
+                pipeline_model.dag_json=json.dumps(pipeline['dag_json'],indent=4,ensure_ascii=False).replace('_','-')
                 pipeline_model.created_by_fk = 1
                 pipeline_model.changed_by_fk = 1
                 pipeline_model.project_id = org_project.id
-                pipeline_model.parameter = json.dumps(pipeline['parameter'])
+                pipeline_model.parameter = json.dumps(pipeline.get('parameter',{}))
                 db.session.add(pipeline_model)
                 db.session.commit()
             except Exception as e:
                 db.session.rollback()
+        else:
+            pipeline_model.describe = pipeline['describe']
+            pipeline_model.dag_json = json.dumps(pipeline['dag_json'],indent=4,ensure_ascii=False).replace('_', '-')
+            pipeline_model.created_by_fk = 1
+            pipeline_model.changed_by_fk = 1
+            pipeline_model.project_id = org_project.id
+            pipeline_model.parameter = json.dumps(pipeline.get('parameter', {}))
+            db.session.commit()
+
 
         # 创建task
         for task in tasks:
@@ -248,11 +255,11 @@ def init():
                     task_model = Task()
                     task_model.name = task['name'].replace('_','-')
                     task_model.label = task['label']
-                    task_model.args = json.dumps(task['args'])
+                    task_model.args = json.dumps(task['args'],indent=4,ensure_ascii=False)
                     task_model.volume_mount = task.get('volume_mount','')
-                    task_model.resource_memory = task['resource_memory']
-                    task_model.resource_cpu = task['resource_cpu']
-                    task_model.resource_gpu = task['resource_gpu']
+                    task_model.resource_memory = task.get('resource_memory','2G')
+                    task_model.resource_cpu = task.get('resource_cpu','2')
+                    task_model.resource_gpu = task.get('resource_gpu','0')
                     task_model.created_by_fk = 1
                     task_model.changed_by_fk = 1
                     task_model.pipeline_id = pipeline_model.id
@@ -261,6 +268,19 @@ def init():
                     db.session.commit()
                 except Exception as e:
                     db.session.rollback()
+            else:
+                task_model.label = task['label']
+                task_model.args = json.dumps(task['args'],indent=4,ensure_ascii=False)
+                task_model.volume_mount = task.get('volume_mount', '')
+                task_model.resource_memory = task.get('resource_memory', '2G')
+                task_model.resource_cpu = task.get('resource_cpu', '2')
+                task_model.resource_gpu = task.get('resource_gpu', '0')
+                task_model.created_by_fk = 1
+                task_model.changed_by_fk = 1
+                task_model.pipeline_id = pipeline_model.id
+                task_model.job_template_id = job_template.id
+                db.session.commit()
+
 
 
     try:
@@ -274,7 +294,7 @@ def init():
 
 
 @app.cli.command('init_db')
-@pysnooper.snoop()
+# @pysnooper.snoop()
 def init_db():
     SQLALCHEMY_DATABASE_URI = conf.get('SQLALCHEMY_DATABASE_URI','')
     import sqlalchemy.engine.url as url
