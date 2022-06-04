@@ -1098,7 +1098,7 @@ class Pipeline_ModelView_Base():
     def web(self,pipeline_id):
         pipeline = db.session.query(Pipeline).filter_by(id=pipeline_id).first()
 
-        pipeline.dag_json = pipeline.fix_dag_json()  # 修正dag_json
+        pipeline.dag_json = pipeline.fix_dag_json()  # 修正 dag_json
         pipeline.expand = json.dumps(pipeline.fix_expand(), indent=4, ensure_ascii=False)   # 修正 前端expand字段缺失
         pipeline.expand = json.dumps(pipeline.fix_position(), indent=4, ensure_ascii=False)  # 修正 节点中心位置到视图中间
 
