@@ -582,9 +582,6 @@ instance_group [
         # 先存储特定参数到expand
         expand = json.loads(item.expand) if item.expand else {}
         print(self.src_item_json)
-        expand['service_token'] = json.loads(self.src_item_json['expand']).get('service_token','') if item.id else ''
-        expand['alias_token'] = json.loads(self.src_item_json['expand']).get('alias_token', '') if item.id else ''
-        expand['alias_l5'] = json.loads(self.src_item_json['expand']).get('alias_l5', '') if item.id else ''
         model_version = item.model_version.replace('v','').replace('.','').replace(':','')
 
         if item.service_type=='tfserving':
@@ -667,6 +664,8 @@ instance_group [
 
     # @pysnooper.snoop(watch_explode=('item',))
     def pre_update(self, item):
+        if not item.volume_mount:
+            item.volume_mount=item.project.volume_mount
         item.name = item.name.replace("_","-")
         # 修改了名称的话，要把之前的删掉
         self.use_expand(item)
@@ -994,6 +993,11 @@ instance_group [
 
         # 以ip形式访问的话，使用的代理ip。不然不好处理机器服务化机器扩容和缩容时ip变化
         SERVICE_EXTERNAL_IP = conf.get('SERVICE_EXTERNAL_IP',None)
+        if not SERVICE_EXTERNAL_IP and service.project.expand:
+            SERVICE_EXTERNAL_IP = json.loads(service.project.expand).get('SERVICE_EXTERNAL_IP', SERVICE_EXTERNAL_IP)
+            if type(SERVICE_EXTERNAL_IP)==str:
+                SERVICE_EXTERNAL_IP = [SERVICE_EXTERNAL_IP]
+
         if SERVICE_EXTERNAL_IP:
             service_ports = [[20000+10*service.id+index,port] for index,port in enumerate(ports)]
             service_external_name = (service.name + "-external").lower()[:60].strip('-')
@@ -1003,7 +1007,7 @@ instance_group [
                 username=service.created_by.username,
                 ports=service_ports,
                 selector={"app": service.name, 'user': service.created_by.username},
-                externalIPs=conf.get('SERVICE_EXTERNAL_IP',None)
+                externalIPs=SERVICE_EXTERNAL_IP
             )
 
         if env!='debug':

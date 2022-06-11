@@ -152,7 +152,7 @@ class Docker_ModelView_Base():
     def debug(self,docker_id):
         docker = db.session.query(Docker).filter_by(id=docker_id).first()
         from myapp.utils.py.py_k8s import K8s
-        k8s_client = K8s(conf.get('CLUSTERS').get(conf.get('ENVIRONMENT')).get('KUBECONFIG'))
+        k8s_client = K8s(conf.get('CLUSTERS').get(conf.get('ENVIRONMENT')).get('KUBECONFIG',''))
         namespace = conf.get('NOTEBOOK_NAMESPACE')
         pod_name="docker-%s-%s"%(docker.created_by.username,str(docker.id))
         pod = k8s_client.get_pods(namespace=namespace,pod_name=pod_name)
@@ -218,7 +218,7 @@ class Docker_ModelView_Base():
     def delete_pod(self,docker_id):
         docker = db.session.query(Docker).filter_by(id=docker_id).first()
         from myapp.utils.py.py_k8s import K8s
-        k8s_client = K8s(conf.get('CLUSTERS').get(conf.get('ENVIRONMENT')).get('KUBECONFIG'))
+        k8s_client = K8s(conf.get('CLUSTERS').get(conf.get('ENVIRONMENT')).get('KUBECONFIG',''))
         namespace = conf.get('NOTEBOOK_NAMESPACE')
         pod_name="docker-%s-%s"%(docker.created_by.username,str(docker.id))
         k8s_client.delete_pods(namespace=namespace,pod_name=pod_name)
@@ -256,7 +256,7 @@ class Docker_ModelView_Base():
     def save(self,docker_id):
         docker = db.session.query(Docker).filter_by(id=docker_id).first()
         from myapp.utils.py.py_k8s import K8s
-        k8s_client = K8s(conf.get('CLUSTERS').get(conf.get('ENVIRONMENT')).get('KUBECONFIG'))
+        k8s_client = K8s(conf.get('CLUSTERS').get(conf.get('ENVIRONMENT')).get('KUBECONFIG',''))
         namespace = conf.get('NOTEBOOK_NAMESPACE')
         pod_name="docker-%s-%s"%(docker.created_by.username,str(docker.id))
         pod = k8s_client.v1.read_namespaced_pod(name=pod_name, namespace=namespace)
@@ -276,7 +276,7 @@ class Docker_ModelView_Base():
         # return redirect('/docker_modelview/list/')
 
         pod_name = "docker-commit-%s-%s" % (docker.created_by.username, str(docker.id))
-        command = ['sh', '-c', 'docker login csighub.tencentyun.com -u pengluan -p 19910101a && docker commit %s %s && docker push %s'%(container_id,docker.target_image,docker.target_image)]
+        command = ['sh', '-c', 'docker commit %s %s && docker push %s'%(container_id,docker.target_image,docker.target_image)]
         hostAliases = conf.get('HOSTALIASES')
         k8s_client.create_debug_pod(
             namespace=namespace,
@@ -292,7 +292,7 @@ class Docker_ModelView_Base():
             resource_gpu='0',
             image_pull_policy='Always',
             image_pull_secrets=conf.get('HUBSECRET', []),
-            image='ai.tencentmusic.com/tme-public/docker',
+            image='ccr.ccs.tencentyun.com/cube-studio/docker',
             hostAliases=hostAliases,
             env=None,
             privileged=None,

@@ -1,4 +1,4 @@
-# docker build -t ai.tencentmusic.com/tme-public/target-detection  .
+# docker build -t ccr.ccs.tencentyun.com/cube-studio/target-detection  .
 
 FROM ubuntu:18.04
 
@@ -32,8 +32,8 @@ RUN pip install Pillow pysnooper opencv-python
 
 RUN pip3 install https://github.com/danielgatis/darknetpy/raw/master/dist/darknetpy-4.1-cp36-cp36m-linux_x86_64.whl
 WORKDIR /app
-#RUN wget https://pengluan-76009.sz.gfp.tencent-cloud.com/github/yolov3.zip && unzip yolov3.zip
+#RUN wget https://pengluan-76009.sz.gfp.tencent-cloud.com/github/yolov3.zip && apt install unzip && unzip yolov3.zip && rm yolov3.zip
 COPY . /app/
 ENTRYPOINT ["python", "server-web.py"]
-# docker run --name darknet --privileged -it --rm -v $PWD:/app -p 8080:8080 --entrypoint='' ai.tencentmusic.com/tme-public/target-detection  bash
+# docker run --name darknet --privileged -it --rm -v $PWD:/app -p 8080:8080 --entrypoint='' ccr.ccs.tencentyun.com/cube-studio/target-detection  bash
 

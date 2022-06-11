@@ -12,6 +12,27 @@ cube是tme开源的一站式云原生机器学习平台，目前主要包含
 
 有意向进行开源共建的同学请微信添加767065521并备注"Cube Studio开源共建"进入微信群.
 
+# 平台部署
+
+参考install/kubernetes/README.md
+
+平台完成部署之后如下:
+
+<img width="100%" alt="167874734-5b1629e0-c3bb-41b0-871d-ffa43d914066" src="https://user-images.githubusercontent.com/20157705/168214806-b8aceb3d-e1b4-48f0-a079-903ef8751f40.png">
+
+# 体验环境
+
+[http://159.75.208.175/](http://81.69.195.6/)
+
+# 相关视频
+
+[单机部署教程](https://www.bilibili.com/video/BV18r4y147oj/)
+
+[新人使用教程](https://www.bilibili.com/video/BV1zA4y1f7Rf)
+
+[job模板制作教程](https://www.bilibili.com/video/BV15B4y197nm)
+
+[边缘计算方式部署和调度](https://www.bilibili.com/video/BV1qY4y1x7Yy/)
 
 # 支持模板
 提示：
@@ -23,7 +44,7 @@ cube是tme开源的一站式云原生机器学习平台，目前主要包含
 | 自定义镜像 | 单机 | 完全自定义单机运行环境，可自由实现所有自定义单机功能 | 系统自带 |
 | datax | 单机 | 异构数据源导入导出 | job-template/job/datax |
 | xgb | 单机 | xgb模型训练 | job-template/job/xgb |
-| deploy-inferenceservice | 单机 | 部署云原生推理服务 | job-template/job/deploy-inferenceservice |
+| deploy-service | 单机 | 部署云原生推理服务 | job-template/job/deploy-service |
 | ray | 分布式 | python ray框架 多机分布式功能，适用于超多文件在多机上的并发处理 | job-template/job/ray |
 | ray-sklearn | 分布式 | 基于ray框架的sklearn支持算法多机分布式并行计算  | job-template/job/ray_sklearn |
 | volcano | 分布式 | volcano框架的多机分布式，可紫玉控制代码，利用环境变量实现多机worker的工作与协同  | job-template/job/volcano |
@@ -39,20 +60,6 @@ cube是tme开源的一站式云原生机器学习平台，目前主要包含
 | tf-model-offline-predict | 分布式 | tf模型离线推理  | job-template/job/tf_model_offline_predict |
 | kaldi-distributed-on-volcanojob | 分布式 | kaldi音频分布式训练  | job-template/job/kaldi_distributed_on_volcanojob |
 
-
-# 平台部署
-
-参考install/README.md
-
-平台完成部署之后如下:
-
-<img width="100%" alt="167874734-5b1629e0-c3bb-41b0-871d-ffa43d914066" src="https://user-images.githubusercontent.com/20157705/168214806-b8aceb3d-e1b4-48f0-a079-903ef8751f40.png">
-
-# 相关视频
-
-[新人使用教程](https://www.bilibili.com/video/BV1zA4y1f7Rf)
-
-[job模板制作教程](https://www.bilibili.com/video/BV15B4y197nm)
 
 # 功能简述
 

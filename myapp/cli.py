@@ -79,7 +79,7 @@ def init():
     except Exception as e:
         print(e)
 
-    # @pysnooper.snoop()
+
     def create_template(repository_id,project_name,image_name,image_describe,job_template_name,job_template_describe='',job_template_command='',job_template_args=None,job_template_volume='',job_template_account='',job_template_expand=None,job_template_env=''):
         if not repository_id:
             return
@@ -174,7 +174,6 @@ def init():
 
 
     # 添加demo 服务
-    # @pysnooper.snoop()
     def create_service(project_name,service_name,service_describe,image_name,command,env,resource_mem='2G',resource_cpu='2',ports='80'):
         service = db.session.query(Service).filter_by(name=service_name).first()
         project = db.session.query(Project).filter_by(name=project_name).filter_by(type='org').first()
@@ -208,7 +207,6 @@ def init():
 
 
     # 创建demo pipeline
-    # @pysnooper.snoop()
     def create_pipeline(tasks,pipeline):
         # 如果项目组或者task的模板不存在就丢失
         org_project = db.session.query(Project).filter_by(name=pipeline['project']).filter_by(type='org').first()
@@ -272,6 +270,9 @@ def init():
                 task_model.label = task['label']
                 task_model.args = json.dumps(task['args'],indent=4,ensure_ascii=False)
                 task_model.volume_mount = task.get('volume_mount', '')
+                task_model.node_selector = task.get('node_selector', 'cpu=true,train=true,org=public')
+                task_model.retry = int(task.get('retry', 0))
+                task_model.timeout = int(task.get('timeout', 0))
                 task_model.resource_memory = task.get('resource_memory', '2G')
                 task_model.resource_cpu = task.get('resource_cpu', '2')
                 task_model.resource_gpu = task.get('resource_gpu', '0')
@@ -281,6 +282,25 @@ def init():
                 task_model.job_template_id = job_template.id
                 db.session.commit()
 
+        # 修正pipeline
+        pipeline_model.dag_json = pipeline_model.fix_dag_json()  # 修正 dag_json
+        pipeline_model.expand = json.dumps(pipeline_model.fix_expand(), indent=4, ensure_ascii=False)   # 修正 前端expand字段缺失
+        pipeline_model.expand = json.dumps(pipeline_model.fix_position(), indent=4, ensure_ascii=False)  # 修正 节点中心位置到视图中间
+        db.session.commit()
+        # 自动排版
+        db_tasks = pipeline_model.get_tasks(db.session)
+        if db_tasks:
+            try:
+                tasks={}
+                for task in db_tasks:
+                    tasks[task.name]=task.to_json()
+
+                from myapp.utils import core
+                expand = core.fix_task_position(pipeline_model.to_json(),tasks,json.loads(pipeline_model.expand))
+                pipeline_model.expand=json.dumps(expand,indent=4,ensure_ascii=False)
+                db.session.commit()
+            except Exception as e:
+                print(e)
 
 
     try:
@@ -291,26 +311,5 @@ def init():
             create_pipeline(pipeline=pipeline,tasks=tasks)
     except Exception as e:
         print(e)
-
-
-@app.cli.command('init_db')
-# @pysnooper.snoop()
-def init_db():
-    SQLALCHEMY_DATABASE_URI = conf.get('SQLALCHEMY_DATABASE_URI','')
-    import sqlalchemy.engine.url as url
-    uri = url.make_url(SQLALCHEMY_DATABASE_URI)
-    """Inits the Myapp application"""
-    import pymysql
-    # 创建连接
-    conn = pymysql.connect(host=uri.host,port=uri.port, user=uri.username, password=uri.password, charset='utf8')
-    # 创建游标
-    cursor = conn.cursor()
-
-    # 创建数据库的sql(如果数据库存在就不创建，防止异常)
-    sql = "CREATE DATABASE IF NOT EXISTS kubeflow DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
-    # 执行创建数据库的sql
-    cursor.execute(sql)
-    conn.commit()
-
 
 
