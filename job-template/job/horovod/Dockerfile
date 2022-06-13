@@ -1,14 +1,14 @@
 # FROM ubuntu:18.04
-FROM nvidia/cuda:11.5.0-cudnn8-runtime-ubuntu20.04
+FROM nvidia/cuda:10.1-cudnn7-runtime-ubuntu18.04
 
 ENV TENSORFLOW_VERSION=2.3.0
 ENV PYTORCH_VERSION=1.6.0
 ENV TORCHVISION_VERSION=0.7.0
 ENV MXNET_VERSION=1.5.0
-ENV HOROVOD_VERSION=0.24.3
+ENV HOROVOD_VERSION=0.20.0
 
 # Python 2.7 or 3.6 is supported by Ubuntu Bionic out of the box
-ARG python=3.8
+ARG python=3.6
 ENV PYTHON_VERSION=${python}
 
 # Set default shell to /bin/bash
@@ -17,7 +17,7 @@ SHELL ["/bin/bash", "-cu"]
 RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-recommends \
         build-essential \
         cmake \
-        g++-5 \
+        g++-4.8 \
         git \
         curl \
         vim \
@@ -79,8 +79,8 @@ RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_confi
     mv /etc/ssh/ssh_config.new /etc/ssh/ssh_config && mkdir /examples
 
 ## Install Horovod
-RUN HOROVOD_CPU_OPERATIONS=MPI HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MXNET=1 \
-    pip install --no-cache-dir horovod==${HOROVOD_VERSION}
+#RUN HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MXNET=1 \
+#    pip install --no-cache-dir horovod==${HOROVOD_VERSION}
 
 RUN pip install pysnooper dill requests kubernetes
 
