@@ -1,15 +1,14 @@
 # FROM ubuntu:18.04
-FROM nvidia/cuda:10.1-cudnn7-runtime-ubuntu18.04
-
+FROM nvidia/cuda:11.5.0-cudnn8-runtime-ubuntu20.04
 
 ENV TENSORFLOW_VERSION=2.3.0
 ENV PYTORCH_VERSION=1.6.0
 ENV TORCHVISION_VERSION=0.7.0
 ENV MXNET_VERSION=1.5.0
-ENV HOROVOD_VERSION=0.20.0
+ENV HOROVOD_VERSION=0.24.3
 
 # Python 2.7 or 3.6 is supported by Ubuntu Bionic out of the box
-ARG python=3.6
+ARG python=3.8
 ENV PYTHON_VERSION=${python}
 
 # Set default shell to /bin/bash
@@ -18,7 +17,7 @@ SHELL ["/bin/bash", "-cu"]
 RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-recommends \
         build-essential \
         cmake \
-        g++-4.8 \
+        g++-5 \
         git \
         curl \
         vim \
@@ -33,13 +32,21 @@ RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-
         ibverbs-providers
 
 RUN if [[ "${PYTHON_VERSION}" == "3.6" ]]; then \
-        apt-get install -y python${PYTHO N_VERSION}-distutils; \
+        apt-get install -y python${PYTHON_VERSION}-distutils; \
     fi
+
 RUN ln -s /usr/bin/python${PYTHON_VERSION} /usr/bin/python
 
-RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
-    python get-pip.py && \
-    rm get-pip.py
+RUN if [[ "${PYTHON_VERSION}" == "3.6" ]]; then \
+        curl -O https://bootstrap.pypa.io/pip/3.6/get-pip.py && \
+        python get-pip.py && \
+        rm get-pip.py; \
+    else \
+        curl -O https://bootstrap.pypa.io/get-pip.py && \
+        python get-pip.py && \
+        rm get-pip.py; \
+    fi
+
 
 # Install TensorFlow, Keras, PyTorch and MXNet
 RUN pip install future typing
@@ -62,10 +69,6 @@ RUN mkdir /tmp/openmpi && \
     ldconfig && \
     rm -rf /tmp/openmpi
 
-# Install Horovod
-RUN HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MXNET=1 \
-    pip install --no-cache-dir horovod==${HOROVOD_VERSION}
-
 # Install OpenSSH for MPI to communicate between containers
 RUN apt-get install -y --no-install-recommends openssh-client openssh-server && \
     mkdir -p /var/run/sshd
@@ -75,13 +78,18 @@ RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_confi
     echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config.new && \
     mv /etc/ssh/ssh_config.new /etc/ssh/ssh_config && mkdir /examples
 
+## Install Horovod
+RUN HOROVOD_CPU_OPERATIONS=MPI HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MXNET=1 \
+    pip install --no-cache-dir horovod==${HOROVOD_VERSION}
 
-
-RUN pip install pysnooper dill requests kubernetes pysnooper
+RUN pip install pysnooper dill requests kubernetes
 
 # Get example python scripts
-COPY demo/* /examples/
+COPY job/horovod/demo/* /examples/
 
 WORKDIR /examples
 
 ENTRYPOINT ["python", "start.py"]
+
+
+# docker run --name horovod -it --entrypoint '' ccr.ccs.tencentyun.com/cube-studio/mpi:horovod-20210401 bash
