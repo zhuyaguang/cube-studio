@@ -290,7 +290,7 @@ def main():
                               plural=CRD_INFO['plural'],
                               namespace=KFJ_NAMESPACE,
                               labels={"run-id":KFJ_RUN_ID})
-        time.sleep(20)
+        time.sleep(60)
 
     mpijob_json = make_mpijob(KFJ_TASK_NAME)
     print('begin create new mpijob: run-id %s' % KFJ_TASK_NAME)
@@ -302,7 +302,7 @@ def main():
         body=mpijob_json
     )
     # 等待创建完成
-    time.sleep(20)
+    time.sleep(200)
 
     pods = k8s_client.get_pods(namespace=KFJ_NAMESPACE,labels={
         "mpi_job_name": KFJ_TASK_NAME
