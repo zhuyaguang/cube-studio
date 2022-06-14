@@ -305,7 +305,6 @@ def main():
     time.sleep(20)
 
     pods = k8s_client.get_pods(namespace=KFJ_NAMESPACE,labels={
-        "job-name": "%s-launcher"%KFJ_TASK_NAME,
         "mpi_job_name": KFJ_TASK_NAME
     })
     if pods:
