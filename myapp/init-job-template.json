@@ -1070,16 +1070,16 @@
                     "condition": "",
                     "sub_args": {}
                 },
-                "--python_file_path": {
+                "--command": {
                     "type": "str",
                     "item_type": "str",
-                    "label": "分布式python文件的地址",
+                    "label": "训练启动命令",
                     "require": 1,
                     "choice": [],
                     "range": "",
-                    "default": "/horovod/examples/tensorflow2/tensorflow2_mnist.py",
+                    "default": "python /horovod/examples/tensorflow2/tensorflow2_mnist.py",
                     "placeholder": "",
-                    "describe": "分布式python文件的地址",
+                    "describe": "训练启动命令",
                     "editable": 1,
                     "condition": "",
                     "sub_args": {}
