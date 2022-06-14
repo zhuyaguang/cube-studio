@@ -39,7 +39,7 @@ KFJ_TASK_VOLUME_MOUNT = os.getenv('KFJ_TASK_VOLUME_MOUNT', '')
 KFJ_TASK_RESOURCE_CPU = os.getenv('KFJ_TASK_RESOURCE_CPU', '')
 KFJ_TASK_RESOURCE_MEMORY = os.getenv('KFJ_TASK_RESOURCE_MEMORY', '')
 NUM_WORKER = 3
-PYTHON_FILE_PATH=''
+COMMAND=''
 WORK_IMAGES='csighub.tencentyun.com/tme-kubeflow/horovod:cpu-20210401'
 
 
@@ -138,10 +138,9 @@ def make_mpijob(name):
                                         "ob1",
                                         "-mca",
                                         "btl",
-                                        "^openib",
-                                        "python",
-                                        PYTHON_FILE_PATH
-                                    ],
+                                        "^openib"
+
+                                    ]+[item.strip() for item in COMMAND.split(' ') if item.strip()],
                                     "env": [
                                         {
                                             "name": "MY_CPU_REQUEST",
@@ -348,13 +347,13 @@ def main():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='mpi config')
     parser.add_argument('--num_worker', type=int, default=2, help='并行worker的数目 (default: 2)')
-    parser.add_argument('--python_file_path', type=str, default='/horovod/examples/tensorflow2/tensorflow2_mnist.py', help='启动文件地址')
+    parser.add_argument('--command', type=str, default='python /horovod/examples/tensorflow2/tensorflow2_mnist.py', help='启动命令')
     parser.add_argument('--work_images', type=str, default='ccr.ccs.tencentyun.com/cube-studio/horovod:20210401', help='worker镜像')
 
     args = parser.parse_args()
     print(args)
     NUM_WORKER = args.num_worker
-    PYTHON_FILE_PATH = args.python_file_path
+    COMMAND = args.command
     WORK_IMAGES = args.work_images
 
     main()
