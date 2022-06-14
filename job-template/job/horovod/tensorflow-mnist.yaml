@@ -11,7 +11,7 @@ spec:
       template:
         spec:
           containers:
-          - image: docker.io/kubeflow/mpi-horovod-mnist
+          - image: ccr.ccs.tencentyun.com/cube-studio/horovod:20210401
             name: mpi-launcher
             command:
             - mpirun
@@ -34,7 +34,7 @@ spec:
             - btl
             - ^openib
             - python
-            - /examples/tensorflow_mnist.py
+            - /horovod/examples/tensorflow2/tensorflow2_mnist.py
             resources:
               limits:
                 cpu: 1
@@ -44,7 +44,7 @@ spec:
       template:
         spec:
           containers:
-          - image: docker.io/kubeflow/mpi-horovod-mnist
+          - image: ccr.ccs.tencentyun.com/cube-studio/horovod:20210401
             name: mpi-worker
             resources:
               limits:

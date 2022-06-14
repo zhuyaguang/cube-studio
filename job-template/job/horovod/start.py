@@ -349,8 +349,8 @@ def main():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='mpi config')
     parser.add_argument('--num_worker', type=int, default=2, help='并行worker的数目 (default: 2)')
-    parser.add_argument('--python_file_path', type=str, default='', help='启动文件地址')
-    parser.add_argument('--work_images', type=str, default='docker.io/kubeflow/mpi-horovod-mnist', help='worker镜像')
+    parser.add_argument('--python_file_path', type=str, default='/horovod/examples/tensorflow2/tensorflow2_mnist.py', help='启动文件地址')
+    parser.add_argument('--work_images', type=str, default='ccr.ccs.tencentyun.com/cube-studio/horovod:20210401', help='worker镜像')
 
     args = parser.parse_args()
     print(args)
