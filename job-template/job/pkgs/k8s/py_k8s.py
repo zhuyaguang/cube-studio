@@ -31,7 +31,6 @@ class K8s():
         else:
             config.load_incluster_config()   # 使用为pod配置的rbac访问集群
         self.v1 = client.CoreV1Api()
-        self.v1beta1 = client.ExtensionsV1beta1Api()
         self.AppsV1Api = client.AppsV1Api()
         self.v1.api_client.configuration.verify_ssl = False  # 只能设置 /usr/local/lib/python3.6/dist-packages/kubernetes/client/configuration.py:   self.verify_ssl= True ---> False
 

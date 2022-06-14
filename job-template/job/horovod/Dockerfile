@@ -14,7 +14,7 @@ RUN echo "alias ll='ls -alF'" >> /root/.bashrc && \
     echo "alias vi='vim'" >> /root/.bashrc && \
     /bin/bash -c "source /root/.bashrc"
 
-RUN pip install pysnooper dill requests kubernetes
+RUN pip install pysnooper dill requests kubernetes==18.20.0
 ENV TZ 'Asia/Shanghai'
 
 COPY job/horovod/* /app/
