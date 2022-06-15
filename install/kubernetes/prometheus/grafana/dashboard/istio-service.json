@@ -133,7 +133,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-istio",
+      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -655,7 +655,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-istio",
+      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -762,7 +762,7 @@
           "text": "service",
           "value": "service"
         },
-        "datasource": "Prometheus-istio",
+        "datasource": "prometheus",
         "definition": "label_values(galley_istio_networking_virtualservices, namespace)",
         "description": null,
         "error": null,
@@ -793,7 +793,7 @@
           "text": "swallow-mysql",
           "value": "swallow-mysql"
         },
-        "datasource": "Prometheus-istio",
+        "datasource": "prometheus",
         "definition": "label_values(istio_requests_total{destination_service_namespace=\"$namespace\"}, destination_service_name)",
         "description": null,
         "error": null,
