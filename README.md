@@ -23,7 +23,8 @@ https://github.com/tencentmusic/cube-studio/wiki
 
 <img border="0" width="20%" src="https://luanpeng.oss-cn-qingdao.aliyuncs.com/github/wechat.jpg" />
  
- 
+<br>
+
 # 支持模板
 
 提示：
@@ -32,7 +33,7 @@ https://github.com/tencentmusic/cube-studio/wiki
 
 | 模板  | 类型 | 组件说明 |
 | :----- | :---- | :---- |
-| 自定义镜像 | 单机 | 完全自定义单机运行环境，可自由实现所有自定义单机功能 | 
+| 自定义镜像 | 单机&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | 完全自定义单机运行环境，可自由实现所有自定义单机功能 | 
 | datax | 单机 | 异构数据源导入导出 | 
 | xgb | 单机 | xgb模型训练 |
 | deploy-service | 单机 | 部署云原生推理服务 | 
@@ -40,6 +41,7 @@ https://github.com/tencentmusic/cube-studio/wiki
 | ray-sklearn | 分布式 | 基于ray框架的sklearn支持算法多机分布式并行计算  |
 | volcano | 分布式 | volcano框架的多机分布式，可紫玉控制代码，利用环境变量实现多机worker的工作与协同  | 
 | pytorchjob-train | 分布式 | 	pytorch的多机多卡分布式训练  | 
+| horovod-train | 分布式 | 	horovod的多机多卡分布式训练  | 
 | media-download | 分布式 | 	分布式媒体文件下载  | 
 | video-audio | 分布式 | 	分布式视频提取音频  | 
 | video-img | 分布式 | 	分布式视频提取图片  | 
@@ -74,7 +76,8 @@ https://github.com/tencentmusic/cube-studio/wiki
 @SeibertronSS <img width="5%" src="https://avatars.githubusercontent.com/u/69496864?v=4" />
 @cyxnzb <img width="5%" src="https://avatars.githubusercontent.com/u/51886383?s=88&v=4" /> 
 @gilearn <img width="5%" src="https://avatars.githubusercontent.com/u/107160156?s=88&v=4" />
- 
+<br>
+<br>
 
 # 合作公司
 
