@@ -24,6 +24,32 @@ https://github.com/tencentmusic/cube-studio/wiki
 <img border="0" width="20%" src="https://luanpeng.oss-cn-qingdao.aliyuncs.com/github/wechat.jpg" />
  
  
+# 支持模板
+
+提示：
+- 1、能单机运行没必要多机运行  
+- 2、开发自定义模板，更符合自己业务线下的需求
+
+| 模板  | 类型 | 组件说明 |
+| :----- | :---- | :---- |
+| 自定义镜像 | 单机 | 完全自定义单机运行环境，可自由实现所有自定义单机功能 | 
+| datax | 单机 | 异构数据源导入导出 | 
+| xgb | 单机 | xgb模型训练 |
+| deploy-service | 单机 | 部署云原生推理服务 | 
+| ray | 分布式 | python ray框架 多机分布式功能，适用于超多文件在多机上的并发处理 |
+| ray-sklearn | 分布式 | 基于ray框架的sklearn支持算法多机分布式并行计算  |
+| volcano | 分布式 | volcano框架的多机分布式，可紫玉控制代码，利用环境变量实现多机worker的工作与协同  | 
+| pytorchjob-train | 分布式 | 	pytorch的多机多卡分布式训练  | 
+| media-download | 分布式 | 	分布式媒体文件下载  | 
+| video-audio | 分布式 | 	分布式视频提取音频  | 
+| video-img | 分布式 | 	分布式视频提取图片  | 
+| model-offline-predict | 分布式 | 	分布式模型离线推理  | 
+| tfjob-train | 分布式 | tf分布式训练，内部支持plain和runner两种方式  | 
+| tfjob-runner | 分布式 | tf分布式-runner方式  | 
+| tfjob-plain | 分布式 | tf分布式-plain方式  | 
+| tf-distribute-model-evaluation | 分布式 | tensorflow2.3分布式模型评估  | 
+| tf-model-offline-predict | 分布式 | tf模型离线推理  | 
+| kaldi-distributed-on-volcanojob | 分布式 | kaldi音频分布式训练  | 
 
  
 # 平台部署
@@ -40,27 +66,16 @@ https://github.com/tencentmusic/cube-studio/wiki
 
 # 贡献
  
-算法(视觉)：@jaffe-fly <img width="5%" src="https://avatars.githubusercontent.com/u/49515380?s=96&v=4" />
-
-算法(文本)：@HHJ
-
-算法(搜广推)： @HHJ
-
-算法(语音)：@ma-chengcheng<img width="5%" src="https://avatars.githubusercontent.com/u/15444349?s=96&v=4" />
-
-算法(传统机器学习)：@chendile <img width="5%" src="https://avatars.githubusercontent.com/u/42484658?s=96&v=4" />
-
-开发：
+@jaffe-fly <img width="5%" src="https://avatars.githubusercontent.com/u/49515380?s=96&v=4" />
+@ma-chengcheng<img width="5%" src="https://avatars.githubusercontent.com/u/15444349?s=96&v=4" />
+@chendile <img width="5%" src="https://avatars.githubusercontent.com/u/42484658?s=96&v=4" />
 @xiaoyangmai <img width="5%" src="https://avatars.githubusercontent.com/u/10969390?s=96&v=4" />
 @VincentWei2021 <img width="5%" src="https://avatars.githubusercontent.com/u/77832074?v=4" />
 @SeibertronSS <img width="5%" src="https://avatars.githubusercontent.com/u/69496864?v=4" />
-
-运营：
 @cyxnzb <img width="5%" src="https://avatars.githubusercontent.com/u/51886383?s=88&v=4" /> 
 @gilearn <img width="5%" src="https://avatars.githubusercontent.com/u/107160156?s=88&v=4" />
  
 
 # 合作公司
 
-@腾讯@腾讯音乐@马上金融@电信研究院@移动研究院@汇丰银行@长亭科技@东方天安@福建博思@平安科技@创维@oppo@美柚@T3出行
-
+![图片 1](https://user-images.githubusercontent.com/20157705/174600451-2fe38ff1-ff78-4bc8-bc63-2a6f5246e0af.png)
