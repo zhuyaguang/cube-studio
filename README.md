@@ -23,8 +23,6 @@ https://github.com/tencentmusic/cube-studio/wiki
 
 <img border="0" width="20%" src="https://luanpeng.oss-cn-qingdao.aliyuncs.com/github/wechat.jpg" />
  
-<br>
-
 # 支持模板
 
 提示：
@@ -55,9 +53,7 @@ https://github.com/tencentmusic/cube-studio/wiki
  
 # 平台部署
 
-[参考wiki](https://github.com/tencentmusic/cube-studio/wiki/%E5%B9%B3%E5%8F%B0%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2)
-
-平台完成部署之后如下:
+[参考wiki](https://github.com/tencentmusic/cube-studio/wiki/%E5%B9%B3%E5%8F%B0%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2) 平台完成部署之后如下:
 
 ![cube](https://user-images.githubusercontent.com/20157705/174762561-29b18237-7d45-417e-b7c0-14f5ef96a0e6.gif)
 
@@ -83,6 +79,6 @@ https://github.com/tencentmusic/cube-studio/wiki
 <br>
 <br>
 
-# 合作公司
+# 落地公司
 
 ![图片 1](https://user-images.githubusercontent.com/20157705/174600451-2fe38ff1-ff78-4bc8-bc63-2a6f5246e0af.png)
