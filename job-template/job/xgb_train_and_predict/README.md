@@ -1,70 +1,149 @@
-# volcanojob 模板
-镜像：ccr.ccs.tencentyun.com/cube-studio/xgb_train_and_predict:v1
+# xgboost 模板
+描述：单机xgb训练，支持训练预测。
 
-环境变量：
+镜像：ccr.ccs.tencentyun.com/cube-studio/xgb_train_and_predict:v1  
+
+环境变量：  
 ```bash
 NO_RESOURCE_CHECK=true
 TASK_RESOURCE_CPU=2
 TASK_RESOURCE_MEMORY=4G
 TASK_RESOURCE_GPU=0
 ```
-账号：kubeflow-pipeline
-启动参数：
+
+启动参数：  
 ```bash
 {
     "shell": {
-        "--working_dir": {
+        "--sep": {
             "type": "str",
-            "item_type": "str",
-            "label": "启动目录",
+            "item_type": "",
+            "label": "分隔符",
             "require": 1,
-            "choice": [],
+            "choice": [
+                "space",
+                "TAB",
+                ","
+            ],
             "range": "",
-            "default": "/mnt/xx",
+            "default": ",",
             "placeholder": "",
-            "describe": "启动目录",
+            "describe": "分隔符",
             "editable": 1,
             "condition": "",
             "sub_args": {}
         },
-        "--command": {
+        "--classifier_or_regressor": {
             "type": "str",
-            "item_type": "str",
-            "label": "启动命令",
+            "item_type": "",
+            "label": "分类还是回归",
             "require": 1,
-            "choice": [],
+            "choice": [
+                "classifier",
+                "regressor"
+            ],
             "range": "",
-            "default": "echo aa",
+            "default": "classifier",
             "placeholder": "",
-            "describe": "启动命令",
+            "describe": "分类还是回归",
             "editable": 1,
             "condition": "",
             "sub_args": {}
         },
-        "--num_worker": {
-            "type": "str",
+        "--params": {
+            "type": "json",
             "item_type": "str",
-            "label": "占用机器个数",
+            "label": "xgb参数",
             "require": 1,
             "choice": [],
             "range": "",
-            "default": "3",
+            "default": "",
             "placeholder": "",
-            "describe": "占用机器个数",
+            "describe": "xgb参数, json格式",
             "editable": 1,
             "condition": "",
             "sub_args": {}
         },
-        "--image": {
-            "type": "str",
-            "item_type": "str",
-            "label": "",
+        "--train_csv_file_path": {
+            "type": "text",
+            "item_type": "",
+            "label": "训练集csv路径",
             "require": 1,
             "choice": [],
             "range": "",
-            "default": "ccr.ccs.tencentyun.com/cube-studio/ubuntu-gpu:cuda10.1-cudnn7-python3.6",
+            "default": "",
             "placeholder": "",
-            "describe": "worker镜像，直接运行你代码的环境镜像<a href='https://docs.qq.com/doc/DU0ptZEpiSmtMY1JT'>基础镜像</a>",
+            "describe": "训练集csv路径，首行是header，首列是label。为空则不做训练，尝试从model_load_path加载模型。",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--model_load_path": {
+            "type": "text",
+            "item_type": "",
+            "label": "模型加载路径",
+            "require": 1,
+            "choice": [],
+            "range": "",
+            "default": "",
+            "placeholder": "",
+            "describe": "模型加载路径。为空则不加载。",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--predict_csv_file_path": {
+            "type": "text",
+            "item_type": "",
+            "label": "预测数据集csv路径",
+            "require": 1,
+            "choice": [],
+            "range": "",
+            "default": "",
+            "placeholder": "",
+            "describe": "预测数据集csv路径，格式和训练集一致，顺序保持一致，没有label列。为空则不做predict。",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--predict_result_path": {
+            "type": "text",
+            "item_type": "",
+            "label": "预测结果保存路径",
+            "require": 1,
+            "choice": [],
+            "range": "",
+            "default": "",
+            "placeholder": "",
+            "describe": "预测结果保存路径，为空则不做predict。",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--model_save_path": {
+            "type": "text",
+            "item_type": "",
+            "label": "模型文件保存路径",
+            "require": 1,
+            "choice": [],
+            "range": "",
+            "default": "",
+            "placeholder": "",
+            "describe": "模型文件保存路径。为空则不保存模型。",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
+        },
+        "--eval_result_path": {
+            "type": "text",
+            "item_type": "",
+            "label": "模型评估报告保存路径",
+            "require": 1,
+            "choice": [],
+            "range": "",
+            "default": "",
+            "placeholder": "",
+            "describe": "模型评估报告保存路径。默认为空，想看模型评估报告就填。",
             "editable": 1,
             "condition": "",
             "sub_args": {}
@@ -72,46 +151,3 @@ TASK_RESOURCE_GPU=0
     }
 }
 ```
-
-# 用户代码示例
-
-保留单机的代码，添加识别集群信息的代码（多少个worker，当前worker是第几个），添加分工（只处理归属于当前worker的任务），
-
-完成。
-
-worker示例：
-```
-import time, datetime, json, requests, io, os
-from multiprocessing import Pool
-from functools import partial
-import os, random
-
-WORLD_SIZE = int(os.getenv('VC_WORKER_NUM', '1'))  # 总worker的数目
-RANK = int(os.getenv("VC_TASK_INDEX", '0'))     # 当前是第几个worker 从0开始
-
-print(WORLD_SIZE, RANK)
-
-
-# 子进程要执行的代码
-def task(key):
-    print('worker:',RANK,', task:',key,flush=True)
-    time.sleep(1)
-
-
-if __name__ == '__main__':
-
-    input = range(30000)    # 所有要处理的数据
-    local_task = []         # 当前worker需要处理的任务
-    for index in input:
-        if index%WORLD_SIZE==RANK:
-            local_task.append(index)     # 要处理的数据均匀分配到每个worker
-
-	    # 每个worker内部还可以用多进程，线程池之类的并发操作。
-    pool = Pool(10)  # 开辟包含指定数目线程的线程池
-    pool.map(partial(task), local_task)  # 当前worker，只处理分配给当前worker的任务
-    pool.close()
-    pool.join()
-```
-
-# 示例
-demo.py

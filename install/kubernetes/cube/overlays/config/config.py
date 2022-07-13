@@ -806,13 +806,13 @@ ALL_LINKS=[
 ]
 
 # 推理服务的各种配置
-TFSERVING_IMAGES=['ccr.ccs.tencentyun.com/cube-studio/serving:1.11.0','ccr.ccs.tencentyun.com/cube-studio/serving:1.11.0-gpu','ccr.ccs.tencentyun.com/cube-studio/serving:1.12.0','ccr.ccs.tencentyun.com/cube-studio/serving:1.12.0-gpu','ccr.ccs.tencentyun.com/cube-studio/serving:1.13.0','ccr.ccs.tencentyun.com/cube-studio/serving:1.13.0-gpu','ccr.ccs.tencentyun.com/cube-studio/serving:1.14.0','ccr.ccs.tencentyun.com/cube-studio/serving:1.14.0-gpu','ccr.ccs.tencentyun.com/cube-studio/serving:2.0.0','ccr.ccs.tencentyun.com/cube-studio/serving:2.0.0-gpu','ccr.ccs.tencentyun.com/cube-studio/serving:2.1.4','ccr.ccs.tencentyun.com/cube-studio/serving:2.1.4-gpu','ccr.ccs.tencentyun.com/cube-studio/serving:2.2.3','ccr.ccs.tencentyun.com/cube-studio/serving:2.2.3-gpu','ccr.ccs.tencentyun.com/cube-studio/serving:2.3.4','ccr.ccs.tencentyun.com/cube-studio/serving:2.3.4-gpu','ccr.ccs.tencentyun.com/cube-studio/serving:2.4.3','ccr.ccs.tencentyun.com/cube-studio/serving:2.4.3-gpu','ccr.ccs.tencentyun.com/cube-studio/serving:2.5.2','ccr.ccs.tencentyun.com/cube-studio/serving:2.5.2-gpu','ccr.ccs.tencentyun.com/cube-studio/serving:2.6.0','ccr.ccs.tencentyun.com/cube-studio/serving:2.6.0-gpu']
+TFSERVING_IMAGES=['ccr.ccs.tencentyun.com/cube-studio/tfserving:1.14.0','ccr.ccs.tencentyun.com/cube-studio/tfserving:1.14.0-gpu','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.0.0','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.0.0-gpu','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.1.4','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.1.4-gpu','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.2.3','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.2.3-gpu','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.3.4','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.3.4-gpu','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.4.3','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.4.3-gpu','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.5.2','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.5.2-gpu','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.6.0','ccr.ccs.tencentyun.com/cube-studio/tfserving:2.6.0-gpu']
 TRITONSERVER_IMAGES=['ccr.ccs.tencentyun.com/cube-studio/tritonserver:21.12-py3','ccr.ccs.tencentyun.com/cube-studio/tritonserver:21.09-py3']
 TORCHSERVER_IMAGES=['ccr.ccs.tencentyun.com/cube-studio/torchserve:0.5.0-cpu','ccr.ccs.tencentyun.com/cube-studio/torchserve:0.5.0-gpu','ccr.ccs.tencentyun.com/cube-studio/torchserve:0.4.2-cpu','ccr.ccs.tencentyun.com/cube-studio/torchserve:0.4.2-gpu']
 INFERNENCE_IMAGES={
     "tfserving":TFSERVING_IMAGES,
     'torch-server':TORCHSERVER_IMAGES,
-    'onnxruntime':['ccr.ccs.tencentyun.com/cube-studio/onnxruntime:v1.0.0','ccr.ccs.tencentyun.com/cube-studio/onnxruntime:server-latest'],
+    'onnxruntime':['ccr.ccs.tencentyun.com/cube-studio/onnxruntime:latest','ccr.ccs.tencentyun.com/cube-studio/onnxruntime:latest-cuda'],
     'triton-server':TRITONSERVER_IMAGES,
     # 'kfserving-tf': TFSERVING_IMAGES,
     # "kfserving-torch":TORCHSERVER_IMAGES,
@@ -848,6 +848,8 @@ INFERNENCE_HEALTH={
     "torch-server":"8080:/ping",
     "triton-server":"8000:/v2/health/ready"
 }
+
+IMAGE_PULL_POLICY='Always'    # IfNotPresent   Always
 
 # 任务资源使用情况地址
 GRAFANA_TASK_PATH='/grafana/d/pod-info/pod-info?var-pod='
