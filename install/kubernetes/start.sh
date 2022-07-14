@@ -3,7 +3,7 @@ mkdir -p ~/.kube/ kubeconfig /data/k8s/kubeflow/pipeline/workspace /data/k8s/kub
 cp config ~/.kube/config
 cp config kubeconfig/dev-kubeconfig
 
-curl -LO https://dl.k8s.io/release/v1.18.0/bin/linux/amd64/kubectl && chmod +x kubectl  && mv kubectl /usr/bin/
+curl -LO https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl && chmod +x kubectl  && mv kubectl /usr/bin/
 node=`kubectl  get node -o wide |grep $1 |awk '{print $1}'| head -n 1`
 kubectl label node $node train=true cpu=true notebook=true service=true org=public istio=true knative=true kubeflow=true kubeflow-dashboard=true mysql=true redis=true monitoring=true logging=true --overwrite
 # 拉取镜像
@@ -15,7 +15,6 @@ wget https://pengluan-76009.sz.gfp.tencent-cloud.com/github/kustomize_v4.5.1_lin
 sh create_ns_secret.sh
 # 部署dashboard
 kubectl apply -f dashboard/v2.2.0-cluster.yaml
-kubectl apply -f dashboard/v2.2.0-user.yaml
 # 部署mysql
 kubectl create -f mysql/pv-pvc-hostpath.yaml
 kubectl create -f mysql/service.yaml
@@ -121,14 +120,7 @@ kubectl apply -f volcano/volcano-development.yaml
 kubectl wait crd/jobs.batch.volcano.sh --for condition=established --timeout=60s
 
 # 部署kubeflow(训练框架+istio)
-kubectl apply -f kubeflow/v1.2.0/sa-rbac.yaml
-#wget https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz && tar -zxvf kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
-wget https://docker-76009.sz.gfp.tencent-cloud.com/kubeflow/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz && tar -zxvf kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
-chmod +x kfctl
-mv kfctl /usr/bin/
-kfctl apply -V -f kubeflow/v1.2.0/kfctl_k8s_istio.v1.2.0.yaml
-
-kubectl delete apiservice v1beta1.webhook.cert-manager.io
+kubectl apply -f kubeflow/sa-rbac.yaml
 
 # 部署kfp pipeline
 kubectl create -f kubeflow/pipeline/minio-pv-hostpath.yaml
@@ -141,10 +133,6 @@ kubectl wait crd/applications.app.k8s.io --for condition=established --timeout=6
 kustomize build env/platform-agnostic/  | kubectl apply -f -
 cd ../../../../
 
-# 部署xgb
-#kubectl kustomize  kubeflow/xgboost-operator/manifests/base | kubectl apply -f -
-# 部署mpi-operator
-kubectl apply -f kubeflow/mpi-operator.yaml
 
 # 部署管理平台
 kubectl delete configmap kubernetes-config -n infra
