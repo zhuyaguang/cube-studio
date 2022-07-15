@@ -9582,9 +9582,9 @@ spec:
             successThreshold: 1
             timeoutSeconds: 1
           resources:
-            limits:
-              cpu: 2000m
-              memory: 1024Mi
+#            limits:
+#              cpu: 2000m
+#              memory: 1024Mi
             requests:
               cpu: 100m
               memory: 128Mi
@@ -10076,26 +10076,26 @@ metadata:
     install.operator.istio.io/owning-resource: unknown
     operator.istio.io/component: "IngressGateways"
 spec:
-  type: LoadBalancer
   selector:
     app: istio-ingressgateway
     istio: ingressgateway
   ports:
-    -
-      name: status-port
+    - name: status-port
       port: 15021
       protocol: TCP
       targetPort: 15021
-    -
-      name: http2
+    - name: http2
       port: 80
       protocol: TCP
       targetPort: 8080
-    -
-      name: https
-      port: 443
+    - name: http3
+      port: 8080
       protocol: TCP
-      targetPort: 8443
+      targetPort: 8080
+#    - name: https
+#      port: 443
+#      protocol: TCP
+#      targetPort: 8443
 ---
 apiVersion: v1
 kind: Service

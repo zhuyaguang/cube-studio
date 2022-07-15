@@ -10,7 +10,7 @@ kubectl label node $node train=true cpu=true notebook=true service=true org=publ
 sh pull_image_kubeflow.sh
 
 #wget https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.5.1/kustomize_v4.5.1_linux_amd64.tar.gz && tar -zxvf kustomize_v4.5.1_linux_amd64.tar.gz && chmod +x kustomize && mv kustomize /usr/bin/
-wget https://pengluan-76009.sz.gfp.tencent-cloud.com/github/kustomize_v4.5.1_linux_amd64.tar.gz && tar -zxvf kustomize_v4.5.1_linux_amd64.tar.gz && chmod +x kustomize && mv kustomize /usr/bin/
+#wget https://pengluan-76009.sz.gfp.tencent-cloud.com/github/kustomize_v4.5.1_linux_amd64.tar.gz && tar -zxvf kustomize_v4.5.1_linux_amd64.tar.gz && chmod +x kustomize && mv kustomize /usr/bin/
 # 创建命名空间
 sh create_ns_secret.sh
 # 部署dashboard
@@ -122,15 +122,21 @@ kubectl wait crd/jobs.batch.volcano.sh --for condition=established --timeout=60s
 # 部署kubeflow(训练框架+istio)
 kubectl apply -f kubeflow/sa-rbac.yaml
 
+# 部署istio
+kubectl apply -f istio/install.yaml
+
+
 # 部署kfp pipeline
 kubectl create -f kubeflow/pipeline/minio-pv-hostpath.yaml
 kubectl apply -f kubeflow/pipeline/minio-artifact-secret.yaml
 kubectl apply -f kubeflow/pipeline/pipeline-runner-rolebinding.yaml
 
 cd kubeflow/pipeline/1.6.0/kustomize/
-kustomize build cluster-scoped-resources/ | kubectl apply -f -
+#kustomize build cluster-scoped-resources/ | kubectl apply -f -
+kubectl apply -k cluster-scoped-resources
 kubectl wait crd/applications.app.k8s.io --for condition=established --timeout=60s
-kustomize build env/platform-agnostic/  | kubectl apply -f -
+#kustomize build env/platform-agnostic/  | kubectl apply -f -
+kubectl apply -k env/platform-agnostic
 cd ../../../../
 
 
