@@ -4,7 +4,7 @@ RUN python3 -m pip install minio
 
 LABEL maintainer "zhuyaguang <zhuyaguang@zhejianglab.com>"
 
-COPY ./download-data.py .
+COPY ./launcher.py .
 
 ENTRYPOINT ["python3", "launcher.py"]
 
