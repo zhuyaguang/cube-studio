@@ -80,12 +80,6 @@
 }
 ```
 
-## 注意：
-
-训练需要的 txt 文件，以及训练结束后生成的 `.pkl` 文件，因为太大了，我都用 git 忽略了。
-
-要运行项目，请在钉钉群里下载 data 和 zdata 两个文件夹，然后放置到本目录中。
-
 ## 参考资料：
 
 1. [博客](https://blog.csdn.net/zp563987805/article/details/104562798/?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0--blog-119957026.pc_relevant_paycolumn_v3&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
