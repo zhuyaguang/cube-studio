@@ -62,23 +62,6 @@
             "condition": "",
             "sub_args": {}
         },
-        "-n": {
-            "type": "str",
-            "item_type": "str",
-            "label": "参数5",
-            "require": 1,
-            "choice": [
-                "resume_BIO.txt",
-                "people_daily_BIO.txt"
-            ],
-            "range": "",
-            "default": "resume_BIO.txt",
-            "placeholder": "",
-            "describe": "和objectname 保持一致",
-            "editable": 1,
-            "condition": "",
-            "sub_args": {}
-        },
         "-pp": {
             "type": "str",
             "item_type": "str",
