@@ -3,11 +3,11 @@
 启动参数：
 ```bash
 {
-    "shell": {
+    "参数分组1": {
         "--modelpath": {
             "type": "str",
             "item_type": "str",
-            "label": "",
+            "label": "参数1",
             "require": 1,
             "choice": [],
             "range": "",
@@ -17,8 +17,21 @@
             "editable": 1,
             "condition": "",
             "sub_args": {}
+        },
+        "--datapath": {
+            "type": "str",
+            "item_type": "str",
+            "label": "参数1",
+            "require": 1,
+            "choice": [],
+            "range": "",
+            "default": "/mnt/admin/mnist",
+            "placeholder": "",
+            "describe": "模型保存路径",
+            "editable": 1,
+            "condition": "",
+            "sub_args": {}
         }
-
     }
 }
 ```
