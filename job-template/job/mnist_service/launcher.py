@@ -103,4 +103,4 @@ async def serve_api(file: UploadFile = File(...)):
 
 if __name__ == "__main__":
     # model_path = './models/model_gpu.dat'
-    uvicorn.run(app=app, host='0.0.0.0', port=8123)
+    uvicorn.run(app=app, host='0.0.0.0', port=8124)
