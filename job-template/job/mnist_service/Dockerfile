@@ -1,4 +1,5 @@
-FROM pytorch/pytorch:0.4_cuda9_cudnn7
+FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-runtime
+
 
 WORKDIR /workspace
 RUN chmod -R a+w /workspace
