@@ -57,7 +57,7 @@ def serve(model, sentence):
 async def read_item(item_id: int):
     return {"item_id": item_id}
 
-@app.get("/ner")
+@app.get("/")
 async def serve_api(s: str):
     res = serve(model, s)
     return {"result": res}
