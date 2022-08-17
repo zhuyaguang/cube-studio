@@ -53,6 +53,7 @@ model = load_model(modelPath,device)
 
 
 transform_vaild = transforms.Compose([
+    transforms.Grayscale(num_output_channels=1),
     transforms.Resize((28,28)),
     transforms.ToTensor()
 ])
