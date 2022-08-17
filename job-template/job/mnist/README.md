@@ -27,7 +27,7 @@
             "range": "",
             "default": "/mnt/admin/mnist",
             "placeholder": "",
-            "describe": "模型保存路径",
+            "describe": "数据读取路径",
             "editable": 1,
             "condition": "",
             "sub_args": {}
