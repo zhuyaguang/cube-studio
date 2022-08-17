@@ -10,7 +10,7 @@
             "require": 1,
             "choice": [],
             "range": "",
-            "default": "BiLSTM_CRF",
+            "default": "模型",
             "placeholder": "",
             "describe": "model",
             "editable": 1,
@@ -29,7 +29,7 @@
             "range": "",
             "default": "resume_BIO.txt",
             "placeholder": "",
-            "describe": "resume_BIO",
+            "describe": "训练数据集选择",
             "editable": 1,
             "condition": "",
             "sub_args": {}
@@ -57,7 +57,7 @@
             "range": "",
             "default": "/mnt/admin/NER/zdata/",
             "placeholder": "",
-            "describe": "path",
+            "describe": "数据集路径",
             "editable": 1,
             "condition": "",
             "sub_args": {}
