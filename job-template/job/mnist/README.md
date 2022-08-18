@@ -1,4 +1,4 @@
-# deploy-service 模板
+# mnsit训练 模板
 镜像：ccr.ccs.tencentyun.com/cube-studio/mnist:20220814
 启动参数：
 ```bash
