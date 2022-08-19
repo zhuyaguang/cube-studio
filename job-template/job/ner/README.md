@@ -129,41 +129,61 @@
 
      ![image-20220819142546299](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819142546299.png)
 
-     ![image-20220819135903909](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819135903909.png)‘
+     
 
      * ner 训练任务参数解析
+
+       ![image-20220819153554234](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819153554234.png)
 
        `--model`: 训练的基础模型名称，这里固定为：`BiLSTM_CRF`。
 
        `--objectname`: 数据集的名字。
 
-       `--epochs`: 训练的次数。
+       `--epochs`: 训练的次数，次数越大效果越好，建议 5 以上。
 
        `--path`：训练数据存放地址，即第三步获取数据存放的路径。
 
        `-pp`：模型保存目录，一般填写 `/mnt/admin/model.pkl` ，方便起服务的时候能够读取到模型路径。
 
      * deploy-service 任务参数解析
-
+     
+       ![image-20220819153746983](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819153746983.png)
+       
+       `--service_type`：服务类型，一般 web 服务镜像填 `serving`。
+       
+       `--images`：服务镜像，上文第二步打的镜像。
+       
+       `--ports`：web 镜像里面  rest 服务的端口号，这里填入将其映射出来
+       
+       
+       
        
 
-5. 保存模版，开始训练，点击日志，查看训练进度
+5. 保存模版，点击运行按钮，开始训练和服务发布，点击日志，查看进度
 
-   ![image-20220819140429808](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819140429808.png)
-
-   
-
-6. 部署服务
-
-   同上，添加 ner-service 任务流
+   ![image-20220819154217916](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819154217916.png)
 
    
+
+6. 发布服务
+
+   点击 `部署生产`，发布服务
+
+   ![image-20220819154311323](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819154311323.png)
 
 7. 使用服务
 
+* 点击 IP 访问服务
 
+> 访问地址后面加上`docs`  类似：`http://10.100.29.62:20070/docs`，可利用 FastAPI 的接口访问服务
 
+* 点击 Try it out ，输入待检测文本
 
+![image-20220819154632361](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819154632361.png)
+
+* 检测结果显示
+
+  ![image-20220819154846051](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819154846051.png)
 
 
 ## 参考资料：
