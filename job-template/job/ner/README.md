@@ -11,7 +11,7 @@
    `docker build -t ccr.ccs.tencentyun.com/cube-studio/ner:20220812 -f Dockerfile .`
    `docker push ccr.ccs.tencentyun.com/cube-studio/ner:20220812`
 
-   ![image-20220819133248945](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819133248945.png)
+   ![image-20220819133248945](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819133248945.png)
 
 2. 服务镜像打包，并添加到 cube-studio
 
@@ -21,7 +21,7 @@
 
    `docker push ccr.ccs.tencentyun.com/cube-studio/ner-service:20220812`
 
-   ![image-20220819133355090](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819133355090.png)
+   ![image-20220819133355090](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819133355090.png)
 
 3. 准备数据集
 
@@ -29,13 +29,13 @@
 
    把数据拷贝到 note book 中 `/mnt/admin/NER` 目录（可以直接拖拽进去）
 
-   ![image-20220819133738821](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819133738821.png)
+   ![image-20220819133738821](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819133738821.png)
 
 4. 集成到 cube-studio 平台
 
    * 添加 训练模版，填写镜像和启动参数
 
-     ![image-20220819134710025](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819134710025.png)
+     ![image-20220819134710025](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819134710025.png)
 
    * 启动参数，可以复制下面
 
@@ -121,19 +121,19 @@
 
    * 添加 ner 训练任务流
 
-     ![image-20220819135607546](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819135607546.png)
+     ![image-20220819135607546](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819135607546.png)
 
    * 进入 任务流，拖取 ner 训练任务模版 和 deploy-service 模版，并填写 任务启动参数
 
      
 
-     ![image-20220819142546299](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819142546299.png)
+     ![image-20220819142546299](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819142546299.png)
 
      
 
      * ner 训练任务参数解析
 
-       ![image-20220819153554234](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819153554234.png)
+       ![image-20220819153554234](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819153554234.png)
 
        `--model`: 训练的基础模型名称，这里固定为：`BiLSTM_CRF`。
 
@@ -147,7 +147,7 @@
 
      * deploy-service 任务参数解析
      
-       ![image-20220819153746983](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819153746983.png)
+       ![image-20220819153746983](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819153746983.png)
        
        `--service_type`：服务类型，一般 web 服务镜像填 `serving`。
        
@@ -161,7 +161,7 @@
 
 5. 保存模版，点击运行按钮，开始训练和服务发布，点击日志，查看进度
 
-   ![image-20220819154217916](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819154217916.png)
+   ![image-20220819154217916](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819154217916.png)
 
    
 
@@ -169,7 +169,7 @@
 
    点击 `部署生产`，发布服务
 
-   ![image-20220819154311323](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819154311323.png)
+   ![image-20220819154311323](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819154311323.png)
 
 7. 使用服务
 
@@ -179,11 +179,11 @@
 
 * 点击 Try it out ，输入待检测文本
 
-![image-20220819154632361](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819154632361.png)
+![image-20220819154632361](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819154632361.png)
 
 * 检测结果显示
 
-  ![image-20220819154846051](/Users/zhuyaguang/Library/Application Support/typora-user-images/image-20220819154846051.png)
+  ![image-20220819154846051](https://zhuyaguang-1308110266.cos.ap-shanghai.myqcloud.com/img/image-20220819154846051.png)
 
 
 ## 参考资料：
