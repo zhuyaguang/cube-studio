@@ -247,6 +247,7 @@ class Workflow_ModelView_Base(Crd_ModelView_Base):
     label_title = '运行实例'
     datamodel = SQLAInterface(Workflow)
     list_columns = ['project','pipeline_url', 'create_time','change_time','elapsed_time', 'final_status','status', 'username', 'log','stop']
+    search_columns = ['status','labels','name','annotations','spec','status_more','username','create_time']
     cols_width = {
         "project": {"type": "ellip2", "width": 200},
         "pipeline_url": {"type": "ellip2", "width": 400},
@@ -260,7 +261,7 @@ class Workflow_ModelView(Workflow_ModelView_Base,MyappModelView,DeleteMixin):
     datamodel = SQLAInterface(Workflow)
 
 
-appbuilder.add_view(Workflow_ModelView,"运行实例",href='/workflow_modelview/list/?_flt_2_name=&_flt_2_labels=',icon = 'fa-tasks',category = '训练')
+appbuilder.add_view_no_menu(Workflow_ModelView)
 
 # 添加api
 class Workflow_ModelView_Api(Workflow_ModelView_Base,MyappModelRestApi):
@@ -275,7 +276,6 @@ appbuilder.add_api(Workflow_ModelView_Api)
 
 
 
-# appbuilder.add_separator("训练")   # 在指定菜单栏下面的每个子菜单中间添加一个分割线的显示。
 #
 #
 # # list正在运行的tfjob

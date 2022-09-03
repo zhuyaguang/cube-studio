@@ -229,7 +229,6 @@ class MyUserRemoteUserModelView(UserModelView):
     ]
 
 
-
     @expose("/userinfo/")
     @has_access
     def userinfo(self):
@@ -245,6 +244,71 @@ class MyUserRemoteUserModelView(UserModelView):
             appbuilder=self.appbuilder,
         )
 
+from flask_appbuilder.security.views import expose, ModelView, SimpleFormView
+from flask_appbuilder.security.forms import LoginForm_db, LoginForm_oid, ResetPasswordForm, UserInfoEdit
+from flask_appbuilder._compat import as_unicode
+from flask_babel import lazy_gettext
+from flask_wtf.recaptcha import RecaptchaField
+from wtforms import BooleanField, PasswordField, StringField
+from wtforms.validators import DataRequired, Email, EqualTo
+
+from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget, BS3TextFieldWidget
+from flask_appbuilder.forms import DynamicForm
+
+
+class UserInfoEditView(SimpleFormView):
+
+    class UserInfoEdit(DynamicForm):
+        first_name = StringField(
+            lazy_gettext("First Name"),
+            validators=[DataRequired()],
+            widget=BS3TextFieldWidget(),
+            description=lazy_gettext("Write the user first name or names"),
+        )
+        last_name = StringField(
+            lazy_gettext("Last Name"),
+            validators=[DataRequired()],
+            widget=BS3TextFieldWidget(),
+            description=lazy_gettext("Write the user last name"),
+        )
+        username = StringField(
+            lazy_gettext("User Name"),
+            validators=[DataRequired()],
+            widget=BS3TextFieldWidget(),
+            description=lazy_gettext("Write the Username"),
+        )
+        email = StringField(
+            lazy_gettext("Email"),
+            validators=[DataRequired()],
+            widget=BS3TextFieldWidget(),
+            description=lazy_gettext("Write the Email"),
+        )
+        org = StringField(
+            lazy_gettext("Org"),
+            widget=BS3TextFieldWidget(),
+            description=lazy_gettext("organization name"),
+        )
+
+    form = UserInfoEdit
+    form_title = lazy_gettext("Edit User Information")
+    redirect_url = "/"
+    message = lazy_gettext("User information changed")
+
+    def form_get(self, form):
+        item = self.appbuilder.sm.get_user_by_id(g.user.id)
+        # fills the form generic solution
+        for key, value in form.data.items():
+            if key == "csrf_token":
+                continue
+            form_field = getattr(form, key)
+            form_field.data = getattr(item, key)
+
+    def form_post(self, form):
+        form = self.form.refresh(request.form)
+        item = self.appbuilder.sm.get_user_by_id(g.user.id)
+        form.populate_obj(item)
+        self.appbuilder.sm.update_user(item)
+        flash(as_unicode(self.message), "info")
 
 
 
@@ -267,14 +331,13 @@ class MyappSecurityManager(SecurityManager):
     userdbmodelview = MyUserRemoteUserModelView
     authdbview = Myauthdbview
 
-
+    # userinfo edit view
+    userinfoeditview = UserInfoEditView
 
     # 构建启动前工作，认证
     @staticmethod
     def before_request():
         g.user = current_user
-        # if len(request.path)>7 and request.path[:7]!='/static' and g.user and hasattr(g.user, 'username'):
-        #     logging.info('------------%s(%s):%s'%(request.method,g.user.username,request.path))
 
     def __init__(self, appbuilder):
         super(MyappSecurityManager, self).__init__(appbuilder)
@@ -469,7 +532,7 @@ class MyappSecurityManager(SecurityManager):
 
     # 添加注册远程用户
     # @pysnooper.snoop()
-    def auth_user_remote_org_user(self, username,org_name='',password=''):
+    def auth_user_remote_org_user(self, username,org_name='',password='',email='',first_name='',last_name=''):
         if not username:
             return None
         # 查找用户
@@ -481,17 +544,22 @@ class MyappSecurityManager(SecurityManager):
         if user is None:
             user = self.add_org_user(
                 username=username,
-                first_name=username,
-                last_name=username,
+                first_name=first_name if first_name else username,
+                last_name=last_name if last_name else username,
                 password=password,
                 org=org_name,               # 添加组织架构
-                email=username + "@tencent.com",
+                email=username + "@tencent.com" if not email else email,
                 roles=[self.find_role(self.auth_user_registration_role),rtx_role] if self.find_role(self.auth_user_registration_role) else [rtx_role,]  #  org_role   添加gamma默认角色,    组织架构角色先不自动添加
             )
         elif not user.is_active:  # 如果用户未激活不允许接入
             print(LOGMSG_WAR_SEC_LOGIN_FAILED.format(username))
             return None
         if user:
+            user.org = org_name if org_name else user.org
+            user.email = email if email else user.email
+            user.first_name = first_name if first_name else user.first_name
+            user.last_name = last_name if last_name else user.last_name
+
             gamma_role = self.find_role(self.auth_user_registration_role)
             if gamma_role and gamma_role not in user.roles:
                 user.roles.append(gamma_role)

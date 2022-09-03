@@ -69,6 +69,7 @@ class Repository_ModelView_Base():
     base_permissions = ['can_add', 'can_edit', 'can_delete', 'can_list', 'can_show']
     base_order = ('id', 'desc')
     order_columns = ['id']
+    search_columns=['name','server','hubsecret','user']
     list_columns = ['name','hubsecret','creator','modified']
     cols_width = {
         "name":{"type": "ellip2", "width": 250},
@@ -87,11 +88,13 @@ class Repository_ModelView_Base():
         ),
         "user": StringField(
             _(datamodel.obj.lab('user')),
+            default='',
             widget=BS3TextFieldWidget(),
             description="镜像仓库的用户名"
         ),
         "password": StringField(
             _(datamodel.obj.lab('password')),
+            default='',
             widget=BS3TextFieldWidget(),
             description="镜像仓库的链接密码"
         )
@@ -164,7 +167,7 @@ class Images_Filter(MyappFilter):
     def apply(self, query, func):
         user_roles = [role.name.lower() for role in list(self.get_user_roles())]
         if "admin" in user_roles:
-            return query
+            return query.order_by(self.model.id.desc())
 
         result = query.order_by(self.model.id.desc())
         return result
@@ -179,6 +182,7 @@ class Images_ModelView_Base():
     cols_width = {
         "images_url":{"type": "ellip2", "width": 500},
     }
+    search_columns = ['created_by','project','repository', 'name', 'describe']
     base_order = ('id', 'desc')
     order_columns = ['id']
     add_columns = ['repository', 'name', 'describe', 'dockerfile', 'gitpath']
@@ -188,16 +192,19 @@ class Images_ModelView_Base():
         "dockerfile": StringField(
             _(datamodel.obj.lab('dockerfile')),
             description='镜像的构建Dockerfile全部内容',
+            default='',
             widget=MyBS3TextAreaFieldWidget(rows=10),
         ),
         "name": StringField(
             _(datamodel.obj.lab('name')),
             description='镜像名称全称，例如ubuntu:20.04',
+            default='',
             widget=BS3TextFieldWidget(),
         ),
         "entrypoint": StringField(
             _(datamodel.obj.lab('entrypoint')),
             description='镜像的入口命令，直接写成单行字符串，例如python xx.py，无需添加[]',
+            default='',
             widget=BS3TextFieldWidget(),
         )
     }
@@ -210,7 +217,7 @@ class Images_ModelView_Base():
 class Images_ModelView(Images_ModelView_Base,MyappModelView,DeleteMixin):
     datamodel = SQLAInterface(Images)
 
-appbuilder.add_view(Images_ModelView,"模板镜像",href="/images_modelview/list/?_flt_2_name=",icon = 'fa-file-image-o',category = '训练')
+appbuilder.add_view_no_menu(Images_ModelView)
 
 
 class Images_ModelView_Api(Images_ModelView_Base,MyappModelRestApi):

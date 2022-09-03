@@ -72,20 +72,22 @@ def init():
 
         add_project('job-template', '基础命令', 'python/bash等直接在服务器命令行中执行命令的模板',{"index":1})
         add_project('job-template', '数据导入导出', '集群与用户机器或其他集群之间的数据迁移',{"index":2})
-        add_project('job-template', '数据处理', '数据的单机或分布式处理任务',{"index":3})
+        add_project('job-template', '数据处理', '数据的单机或分布式处理任务,ray/spark/hadoop/volcanojob',{"index":3})
         add_project('job-template', '机器学习', '传统机器学习，lr/决策树/gbdt/xgb/fm等', {"index": 4})
-        add_project('job-template', 'tf分布式', 'tf相关的训练，模型校验，离线预测等功能', {"index": 5})
-        add_project('job-template', 'pytorch分布式', 'pytorch相关的训练，模型校验，离线预测等功能', {"index": 6})
-        add_project('job-template', 'xgb分布式', 'xgb相关的训练，模型校验，离线预测等功能', {"index": 7})
-        add_project('job-template', '模型服务化', '模型服务化部署相关的组件模板', {"index": 8})
-        add_project('job-template', '推荐类模板', '推荐领域常用的任务模板', {"index": 9})
-        add_project('job-template', '多媒体类模板', '音视频图片文本常用的任务模板', {"index": 10})
-        add_project('job-template', '搜索类模板', '向量搜索常用的任务模板', {"index": 11})
+        add_project('job-template', '深度学习', '深度框架训练，tf/pytorch/mxnet/mpi/horovod/kaldi等', {"index": 5})
+        add_project('job-template', 'tf分布式', 'tf相关的训练，模型校验，离线预测等功能', {"index": 6})
+        add_project('job-template', 'pytorch分布式', 'pytorch相关的训练，模型校验，离线预测等功能', {"index": 7})
+        add_project('job-template', 'xgb分布式', 'xgb相关的训练，模型校验，离线预测等功能', {"index": 8})
+        add_project('job-template', '模型服务化', '模型服务化部署相关的组件模板', {"index": 9})
+        add_project('job-template', '推荐类模板', '推荐领域常用的任务模板', {"index": 10})
+        add_project('job-template', '多媒体类模板', '音视频图片文本常用的任务模板', {"index": 11})
+        add_project('job-template', '搜索类模板', '向量搜索常用的任务模板', {"index": 12})
+
     except Exception as e:
         print(e)
 
 
-    def create_template(repository_id,project_name,image_name,image_describe,job_template_name,job_template_describe='',job_template_command='',job_template_args=None,job_template_volume='',job_template_account='',job_template_expand=None,job_template_env='',gitpath=''):
+    def create_template(repository_id,project_name,image_name,image_describe,job_template_name,job_template_old_names=[],job_template_describe='',job_template_command='',job_template_args=None,job_template_volume='',job_template_account='',job_template_expand=None,job_template_env='',gitpath=''):
         if not repository_id:
             return
         images = db.session.query(Images).filter_by(name=image_name).first()
@@ -107,8 +109,13 @@ def init():
                 print(e)
                 db.session.rollback()
 
-
         job_template = db.session.query(Job_Template).filter_by(name=job_template_name).first()
+        if not job_template:
+            for old_name in job_template_old_names:
+                job_template = db.session.query(Job_Template).filter_by(name=old_name).first()
+                if job_template:
+                    break
+
         project = db.session.query(Project).filter_by(name=project_name).filter_by(type='job-template').first()
         if project and images.id:
             if job_template is None:
@@ -119,6 +126,7 @@ def init():
                     job_template.entrypoint=job_template_command
                     job_template.volume_mount=job_template_volume
                     job_template.accounts=job_template_account
+                    job_template_expand['source']="github"
                     job_template.expand = json.dumps(job_template_expand,indent=4,ensure_ascii=False) if job_template_expand else '{}'
                     job_template.created_by_fk=1
                     job_template.changed_by_fk=1
@@ -135,10 +143,12 @@ def init():
                     db.session.rollback()
             else:
                 try:
+                    job_template.name = job_template_name.replace('_','-')
                     job_template.describe = job_template_describe
                     job_template.entrypoint = job_template_command
                     job_template.volume_mount = job_template_volume
                     job_template.accounts = job_template_account
+                    job_template_expand['source'] = "github"
                     job_template.expand = json.dumps(job_template_expand, indent=4,ensure_ascii=False) if job_template_expand else '{}'
                     job_template.created_by_fk = 1
                     job_template.changed_by_fk = 1
@@ -189,6 +199,7 @@ def init():
 
 
     # 创建demo pipeline
+    # @pysnooper.snoop()
     def create_pipeline(tasks,pipeline):
         # 如果项目组或者task的模板不存在就丢失
         org_project = db.session.query(Project).filter_by(name=pipeline['project']).filter_by(type='org').first()
@@ -211,7 +222,7 @@ def init():
                 pipeline_model.created_by_fk = 1
                 pipeline_model.changed_by_fk = 1
                 pipeline_model.project_id = org_project.id
-                pipeline_model.parameter = json.dumps(pipeline.get('parameter',{}))
+                pipeline_model.parameter = json.dumps(pipeline.get('parameter',{}),indent=4,ensure_ascii=False)
                 db.session.add(pipeline_model)
                 db.session.commit()
                 print('add pipeline %s' % pipeline['name'])
@@ -303,35 +314,41 @@ def init():
 
 
     # 添加 demo 推理 服务
-    def create_dataset(name,field,label,status,describe,url,industry,source,source_type,file_type,research,storage_class,storage_size,download_url):
-        dataset = db.session.query(Dataset).filter_by(name=name).first()
+    def create_dataset(**kwargs):
+        dataset = db.session.query(Dataset).filter_by(name=kwargs['name']).first()
         if not dataset:
             try:
                 dataset = Dataset()
-                dataset.name = name
-                dataset.field=field
-                dataset.label=label
-                dataset.status=status
-                dataset.describe=describe
-                dataset.url = url
-                dataset.source=source
-                dataset.industry=industry
-                dataset.source_type=source_type
-                dataset.file_type=file_type
-                dataset.research=research
-                dataset.storage_class=storage_class
-                dataset.storage_size = storage_size
-                dataset.download_url = download_url
-                dataset.owner = '*'
+                dataset.name = kwargs['name']
+                dataset.field=kwargs.get('field','')
+                dataset.label=kwargs.get('label','')
+                dataset.status=kwargs.get('status','')
+                dataset.describe=kwargs.get('describe','')
+                dataset.url = kwargs.get('url','')
+                dataset.source=kwargs.get('source','')
+                dataset.industry=kwargs.get('industry','')
+                dataset.source_type=kwargs.get('source_type','')
+                dataset.file_type=kwargs.get('file_type','')
+                dataset.research=kwargs.get('research','')
+                dataset.usage=kwargs.get('usage','')
+                dataset.years = kwargs.get('years', '')
+                dataset.path = kwargs.get('path', '')
+                dataset.duration = kwargs.get('duration', '')
+                dataset.entries_num = kwargs.get('entries_num', '')
+                dataset.price = kwargs.get('price', '')
+                dataset.icon = kwargs.get('icon', '')
+                dataset.storage_class=kwargs.get('storage_class','')
+                dataset.storage_size = kwargs.get('storage_size','')
+                dataset.download_url = kwargs.get('download_url','')
+                dataset.owner = 'admin'
                 dataset.created_by_fk=1
                 dataset.changed_by_fk=1
                 db.session.add(dataset)
                 db.session.commit()
-                print('add dataset %s' % name)
+                print('add dataset %s' % kwargs.get('name',''))
             except Exception as e:
                 print(e)
                 db.session.rollback()
-
     try:
         print('begin init dataset')
         datasets = db.session.query(Dataset).all()  # 空白数据集才初始化
@@ -390,7 +407,8 @@ def init():
 
 
     # 添加demo 服务
-    def create_service(project_name,service_name,service_describe,image_name,command,env,resource_memory='2G',resource_cpu='2',resource_gpu='0',ports='80',volume_mount='kubeflow-user-workspace(pvc):/mnt'):
+    # @pysnooper.snoop()
+    def create_service(project_name,service_name,service_describe,image_name,command,env,resource_memory='2G',resource_cpu='2',resource_gpu='0',ports='80',volume_mount='kubeflow-user-workspace(pvc):/mnt',expand={}):
         service = db.session.query(Service).filter_by(name=service_name).first()
         project = db.session.query(Project).filter_by(name=project_name).filter_by(type='org').first()
         if service is None and project:
@@ -409,6 +427,7 @@ def init():
                 service.env='\n'.join([x.strip() for x in env.split('\n') if x.split()])
                 service.ports = ports
                 service.volume_mount=volume_mount
+                service.expand = json.dumps(expand, indent=4, ensure_ascii=False)
                 db.session.add(service)
                 db.session.commit()
                 print('add service %s'%service_name)
@@ -428,7 +447,8 @@ def init():
 
 
     # 添加 demo 推理 服务
-    def create_inference(project_name,service_name,service_describe,image_name,command,env,model_name,workdir='',model_version='',model_path='',service_type='serving',resource_memory='2G',resource_cpu='2',resource_gpu='0',ports='80',volume_mount='kubeflow-user-workspace(pvc):/mnt',metrics='',health='',inference_config=''):
+    # @pysnooper.snoop()
+    def create_inference(project_name,service_name,service_describe,image_name,command,env,model_name,workdir='',model_version='',model_path='',service_type='serving',resource_memory='2G',resource_cpu='2',resource_gpu='0',ports='80',volume_mount='kubeflow-user-workspace(pvc):/mnt',metrics='',health='',inference_config='',expand={}):
         service = db.session.query(InferenceService).filter_by(name=service_name).first()
         project = db.session.query(Project).filter_by(name=project_name).filter_by(type='org').first()
         if service is None and project:
@@ -455,7 +475,7 @@ def init():
                 service.volume_mount=volume_mount
                 service.metrics=metrics
                 service.health=health
-                service.expand = "{}"
+                service.expand = json.dumps(expand,indent=4,ensure_ascii=False)
 
                 from myapp.views.view_inferenceserving import InferenceService_ModelView_base
                 inference_class = InferenceService_ModelView_base()

@@ -46,7 +46,7 @@ CSV_EXPORT = {"encoding": "utf_8_sig"}
 WTF_CSRF_ENABLED = False
 
 # 跨域访问允许通过的站点
-WTF_CSRF_EXEMPT_LIST = ['example.local.com']
+WTF_CSRF_EXEMPT_LIST = ["myapp.views.core.log"]
 
 # 是否debug模式运行
 DEBUG = os.environ.get("FLASK_ENV") == "development"
@@ -676,6 +676,20 @@ CRD_INFO={
         'kind': 'SparkApplication',
         "plural": "sparkapplications",
         "timeout": 60 * 60 * 24 * 2
+    },
+    "paddlejob":{
+        "group": "batch.paddlepaddle.org",
+        "version": "v1",
+        'kind': 'PaddleJob',
+        "plural": "paddlejobs",
+        "timeout": 60 * 60 * 24 * 2
+    },
+    "mxjob":{
+        "group": "kubeflow.org",
+        "version": "v1",
+        'kind': 'MXJob',
+        "plural": "mxjobs",
+        "timeout": 60 * 60 * 24 * 2
     }
 }
 
@@ -726,13 +740,11 @@ PIPELINE_NAMESPACE = 'pipeline'
 # 服务pipeline运行的空间，必填service
 SERVICE_PIPELINE_NAMESPACE='service'
 # 超参搜索命名空间，必填katib
-KATIB_NAMESPACE = 'katib'
+AUTOML_NAMESPACE = 'katib'
 # notebook必填空间，必填jupyter
 NOTEBOOK_NAMESPACE = 'jupyter'
 # 内部服务命名空间，必填service
 SERVICE_NAMESPACE = 'service'
-# kfserving命名空间，必填kfserving
-KFSERVING_NAMESPACE = 'kfserving'
 # 服务链路追踪地址
 SERVICE_PIPELINE_ZIPKIN='http://xx.xx.xx.xx:9401'
 SERVICE_PIPELINE_JAEGER='tracing.service'
@@ -748,7 +760,7 @@ HUBSECRET = ['hubsecret']
 REPOSITORY_ORG='ccr.ccs.tencentyun.com/cube-studio/'
 # notebook每个pod使用的用户账号
 JUPYTER_ACCOUNTS='jupyter-user'
-HUBSECRET_NAMESPACE=[PIPELINE_NAMESPACE,KATIB_NAMESPACE,NOTEBOOK_NAMESPACE,SERVICE_NAMESPACE,KFSERVING_NAMESPACE]
+HUBSECRET_NAMESPACE=[PIPELINE_NAMESPACE,AUTOML_NAMESPACE,NOTEBOOK_NAMESPACE,SERVICE_NAMESPACE]
 
 # notebook使用的镜像
 NOTEBOOK_IMAGES=[
@@ -816,7 +828,7 @@ ALL_LINKS=[
     {
         "label":"Grafana",
         "name":"grafana",
-        "url": '/grafana/'  # 访问grafana的域名地址
+        "url": '/grafana/d/pod-info/pod-info?orgId=1&refresh=5s&from=now-15m&to=now'  # 访问grafana的域名地址
     }
 ]
 
@@ -830,14 +842,7 @@ INFERNENCE_IMAGES={
     "tfserving":TFSERVING_IMAGES,
     'torch-server':TORCHSERVER_IMAGES,
     'onnxruntime':ONNXRUNTIME_IMAGES,
-    'triton-server':TRITONSERVER_IMAGES,
-    # 'kfserving-tf': TFSERVING_IMAGES,
-    # "kfserving-torch":TORCHSERVER_IMAGES,
-    # "kfserving-triton": TRITONSERVER_IMAGES,
-    # 'kfserving-sklearn': ['ccr.ccs.tencentyun.com/cube-studio/sklearnserver:v0.7.0'],
-    # 'kfserving-xgboost': ['ccr.ccs.tencentyun.com/cube-studio/sklearnserver:v0.7.0'],
-    # 'kfserving-lightgbm':['ccr.ccs.tencentyun.com/cube-studio/lgbserver:v0.7.0'],
-    # 'kfserving-paddle':['ccr.ccs.tencentyun.com/cube-studio/paddleserver:v0.7.0']
+    'triton-server':TRITONSERVER_IMAGES
 }
 
 INFERNENCE_COMMAND={
@@ -865,7 +870,7 @@ INFERNENCE_HEALTH={
     "torch-server":"8080:/ping",
     "triton-server":"8000:/v2/health/ready"
 }
-
+DOCKER_IMAGES='ccr.ccs.tencentyun.com/cube-studio/docker'
 # notebook，pipeline镜像拉取策略
 IMAGE_PULL_POLICY='Always'    # IfNotPresent   Always
 

@@ -249,6 +249,7 @@ class MyappModelBase():
         "priority":"优先级",
         "owner": "责任人",
         "industry":"行业",
+		"skip":"跳过",
         "etl_pipeline": "任务流",
         "etl_pipeline_id": "任务流id",
         "etl_task": "任务",
@@ -259,6 +260,7 @@ class MyappModelBase():
         "responsible":"责任人",
         "cycle_unit":"周期单位",
         "task_type":"任务类型",
+        "help":"帮助",
         "creator": "创建者",
         "created_by": "创建者",
         "changed_by": "修改者",
@@ -267,7 +269,8 @@ class MyappModelBase():
         "update_time":"更新时间",
         "changed_on": "修改时间",
         "change_time":"更新时间",
-        "modified": "修改时间"
+        "modified": "修改时间",
+		"cronjob_start_time":"补录起点"
     }
 
     # 获取列的中文显示

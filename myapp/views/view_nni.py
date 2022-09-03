@@ -126,7 +126,7 @@ class NNI_ModelView_Base():
 
     edit_form_extra_fields['name'] = StringField(
         _(datamodel.obj.lab('name')),
-        description='英文名(字母、数字、- 组成)，最长50个字符',
+        description='英文名(小写字母、数字、- 组成)，最长50个字符',
         widget=BS3TextFieldWidget(),
         validators=[DataRequired(), Regexp("^[a-z][a-z0-9\-]*[a-z0-9]$"), Length(1, 54)]
     )
@@ -376,7 +376,7 @@ class NNI_ModelView_Base():
 
         from myapp.utils.py.py_k8s import K8s
         k8s_client = K8s(nni.project.cluster.get('KUBECONFIG',''))
-        namespace = conf.get('KATIB_NAMESPACE')
+        namespace = conf.get('AUTOML_NAMESPACE','katib')
         run_id='nni-'+nni.name
 
         try:
@@ -571,7 +571,7 @@ tuner:
 trial:
   codeDir: {nni.working_dir}  
 frameworkcontrollerConfig:
-  namespace: {conf.get('KATIB_NAMESPACE','katib')}
+  namespace: {conf.get('AUTOML_NAMESPACE','katib')}
   storage: pvc
   configPath: /mnt/{nni.created_by.username}/nni/{nni.name}/trial_template.yaml  
   pvc: 
@@ -660,7 +660,7 @@ frameworkcontrollerConfig:
         nni = db.session.query(NNI).filter_by(id=nni_id).first()
         from myapp.utils.py.py_k8s import K8s
         k8s = K8s(nni.project.cluster.get('KUBECONFIG',''))
-        namespace = conf.get('KATIB_NAMESPACE')
+        namespace = conf.get('AUTOML_NAMESPACE')
         pod = k8s.get_pods(namespace=namespace, pod_name=nni.name)
         if pod:
             pod = pod[0]
@@ -717,10 +717,9 @@ class NNI_ModelView(NNI_ModelView_Base,MyappModelView):
     conv = GeneralModelConverter(datamodel)
 
 
-appbuilder.add_separator("训练")   # 在指定菜单栏下面的每个子菜单中间添加一个分割线的显示。
 # 添加视图和菜单
 # appbuilder.add_view(NNI_ModelView,"nni超参搜索",icon = 'fa-shopping-basket',category = '超参搜索',category_icon = 'fa-share-alt')
-appbuilder.add_view(NNI_ModelView,"nni超参搜索",icon = 'fa-shopping-basket',category = '训练')
+appbuilder.add_view_no_menu(NNI_ModelView)
 # appbuilder.add_view_no_menu(NNI_ModelView)
 
 # 添加api

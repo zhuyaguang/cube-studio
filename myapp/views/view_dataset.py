@@ -80,8 +80,8 @@ class Dataset_ModelView_base():
     base_order = ("id", "desc")
     order_columns=['id']
 
-    add_columns = ['name','label','describe','source_type','source','industry','field','usage','research','storage_class','file_type','years','url','download_url','path','storage_size','entries_num','duration','price','status']
-    show_columns = ['id','name','label','describe','source_type','source','industry','field','usage','research','storage_class','file_type','status','years','url','path','download_url','storage_size','entries_num','duration','price']
+    add_columns = ['name','label','describe','source_type','source','industry','field','usage','research','storage_class','file_type','years','url','download_url','path','storage_size','entries_num','duration','price','status','icon','owner']
+    show_columns = ['id','name','label','describe','source_type','source','industry','field','usage','research','storage_class','file_type','status','years','url','path','download_url','storage_size','entries_num','duration','price','status','icon','owner']
     search_columns=['name','label','describe','source_type','source','industry','field','usage','research','storage_class','file_type','status','years','url','path','download_url']
     spec_label_columns = {
         "source_type":"来源类型",
@@ -98,22 +98,24 @@ class Dataset_ModelView_base():
         "path":"本地路径",
         "entries_num":"条目数量",
         "duration":"文件时长",
-        "price": "价格"
+        "price": "价格",
+        "icon": "示例图",
+        "icon_html":"示例图",
     }
 
     edit_columns = add_columns
-    list_columns = ['name','label','describe','source_type','source','status','industry','field','url_html','download_url_html','usage','research','storage_class','file_type','years','path','storage_size','entries_num','duration','price','owner']
+    list_columns = ['icon_html','name','label','describe','source_type','source','status','industry','field','url_html','download_url_html','usage','research','storage_class','file_type','years','path','storage_size','entries_num','duration','price','owner']
     cols_width = {
-        "name": {"type": "ellip1", "width": 250},
-        "label": {"type": "ellip1", "width": 300},
-        "describe":{"type": "ellip1", "width": 300},
+        "name": {"type": "ellip1", "width": 200},
+        "label": {"type": "ellip2", "width": 250},
+        "describe":{"type": "ellip2", "width": 300},
         "field":{"type": "ellip1", "width": 100},
         "source_type":{"type": "ellip1", "width": 100},
         "source": {"type": "ellip1", "width": 100},
         "industry": {"type": "ellip1", "width": 100},
         "url_html": {"type": "ellip1", "width": 200},
         "download_url_html": {"type": "ellip1", "width": 200},
-        "path":{"type": "ellip1", "width": 200},
+        "path":{"type": "ellip2", "width": 200},
         "storage_class": {"type": "ellip1", "width": 100},
         "storage_size":{"type": "ellip1", "width": 100},
         "file_type":{"type": "ellip1", "width": 100},
@@ -123,27 +125,31 @@ class Dataset_ModelView_base():
         "duration": {"type": "ellip1", "width": 100},
         "price": {"type": "ellip1", "width": 100},
         "years": {"type": "ellip2", "width": 100},
-        "usage": {"type": "ellip1", "width": 100},
-        "research": {"type": "ellip1", "width": 100},
+        "usage": {"type": "ellip1", "width": 200},
+        "research": {"type": "ellip2", "width": 100},
+        "icon_html": {"type": "ellip1", "width": 100},
     }
 
     add_form_extra_fields = {
         "name": StringField(
             label=_(datamodel.obj.lab('name')),
             description='数据集英文名',
+            default='',
             widget=BS3TextFieldWidget(),
             validators=[DataRequired()]
         ),
         "label": StringField(
             label=_(datamodel.obj.lab('label')),
+            default='',
             description='数据集中文名',
             widget=BS3TextFieldWidget(),
             validators=[DataRequired()]
         ),
         "describe": StringField(
             label=_(datamodel.obj.lab('describe')),
+            default='',
             description='数据集描述',
-            widget=BS3TextFieldWidget(),
+            widget=MyBS3TextAreaFieldWidget(),
             validators=[DataRequired()]
         ),
         "industry": SelectField(
@@ -180,7 +186,7 @@ class Dataset_ModelView_base():
             label=_(datamodel.obj.lab('file_type')),
             description='文件类型',
             widget=MySelect2Widget(can_input=True),
-            choices=[[x, x] for x in ["png", "jpg",'txt','csv','wav','mp3','mp4','nv4']],
+            choices=[[x, x] for x in ["png", "jpg",'txt','csv','wav','mp3','mp4','nv4','zip','gz']],
         ),
         "storage_class": SelectField(
             label=_(datamodel.obj.lab('storage_class')),
@@ -205,15 +211,38 @@ class Dataset_ModelView_base():
             widget=MySelect2Widget(can_input=True),
             choices=[[x, x] for x in ["损坏", "正常",'未购买','已购买','未标注','已标注','未校验','已校验']],
         ),
+        "url": StringField(
+            label=_(datamodel.obj.lab('url')),
+            description='相关网址',
+            widget=MyBS3TextAreaFieldWidget(rows=3),
+            default=''
+        ),
+        "path": StringField(
+            label=_(datamodel.obj.lab('path')),
+            description='本地路径',
+            widget=MyBS3TextAreaFieldWidget(rows=3),
+            default=''
+        ),
+        "download_url": StringField(
+            label=_(datamodel.obj.lab('download_url')),
+            description='下载地址',
+            widget=MyBS3TextAreaFieldWidget(rows=3),
+            default=''
+        )
     }
     edit_form_extra_fields = add_form_extra_fields
 
 
     import_data=True
+    download_data=True
 
-    def post_list(self,items):
-        flash(Markup('可批量删除不使用的数据集,可批量上传自产数据集'),category='info')
-        return items
+    def pre_add(self,item):
+        if not item.owner:
+            item.owner=g.user.username
+
+    # def post_list(self,items):
+    #     flash(Markup('可批量删除不使用的数据集,可批量上传自产数据集'),category='info')
+    #     return items
 
 class Dataset_ModelView_Api(Dataset_ModelView_base,MyappModelRestApi):
     datamodel = SQLAInterface(Dataset)

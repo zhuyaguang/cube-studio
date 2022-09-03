@@ -2,13 +2,51 @@
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
 from wtforms import Field
 from flask_appbuilder.fieldwidgets import BS3TextFieldWidget,BS3PasswordFieldWidget,DatePickerWidget,DateTimePickerWidget,Select2ManyWidget,Select2Widget
-
+from wtforms import widgets
 from myapp import app
 
 conf = app.config
 
 
 from wtforms.validators import DataRequired, Length, NumberRange, Optional,Regexp,ValidationError
+# from myapp.models.base import MyappModelBase
+# model_base=MyappModelBase()
+#
+# class StringField(Field):
+#     """
+#     This field is the base for most of the more complicated fields, and
+#     represents an ``<input type="text">``.
+#     """
+#     widget = widgets.TextInput()
+#
+#
+#     def __init__(self, label=None, validators=None, filters=tuple(),
+#                  description='', id=None, default=None, widget=None,
+#                  render_kw=None, _form=None, _name=None, _prefix='',
+#                  _translations=None, _meta=None):
+#         label=_(model_base.lab('server')) if label==None  else label
+#         default='' if default==None else default
+#         widget=BS3TextFieldWidget() if widget==None else widget
+#         description=description if description else ''
+#         validators = [] if validators==None else validators
+#
+#         return super(StringField, self).__init__(label=label,default=default,widget=widget,validators=validators,description=description)
+#
+#     # @pysnooper.snoop()
+#     def process_formdata(self, valuelist):
+#         # aa = self.data
+#         if not self.data:
+#             self.data=''
+#         if valuelist:
+#             self.data = valuelist[0]
+#         elif self.data is None:
+#             self.data = ''
+#         aa = self.data
+#
+#     # @pysnooper.snoop()
+#     def _value(self):
+#         return text_type(self.data) if self.data is not None else ''
+
 
 # 处理完再校验
 class JsonValidator(object):
@@ -75,10 +113,12 @@ class MyCodeArea(object):
 
 from wtforms import widgets
 class MyBS3TextAreaFieldWidget(widgets.TextArea):
-    def __init__(self, rows=3,readonly=0):
+    def __init__(self, rows=3,readonly=0,expand_filed=None):  # 扩展成list类型字段
         self.rows=rows
         self.readonly = readonly
+        self.expand_filed=expand_filed
         return super(MyBS3TextAreaFieldWidget, self).__init__()
+
     def __call__(self, field, **kwargs):
         kwargs["class"] = u"form-control"
         kwargs["rows"] = self.rows
@@ -90,9 +130,11 @@ class MyBS3TextAreaFieldWidget(widgets.TextArea):
 
 
 class MyBS3TextFieldWidget(widgets.TextInput):
-    def __init__(self, value='',readonly=0):
+    def __init__(self, value='',readonly=0,is_date=False,is_date_range=False):
         self.value=value
         self.readonly = readonly
+        self.is_date=is_date
+        self.is_date_range=is_date_range
         return super(MyBS3TextFieldWidget, self).__init__()
 
     def __call__(self, field, **kwargs):
@@ -173,7 +215,7 @@ class MySelect2Widget(object):
 
     extra_classes = None
 
-    def __init__(self, extra_classes=None, style=None,multiple=False,new_web=True,value='',can_input=False,conten2choices=False):
+    def __init__(self, extra_classes=None, style=None,multiple=False,new_web=True,value='',can_input=False,conten2choices=False,retry_info=False):
         self.extra_classes = extra_classes
         self.style = style or u"width:350px"
         self.multiple = multiple
@@ -181,6 +223,7 @@ class MySelect2Widget(object):
         self.new_web=new_web
         self.can_input = can_input
         self.conten2choices=conten2choices
+        self.retry_info=retry_info
 
     # @pysnooper.snoop()
     def __call__(self, field, **kwargs):

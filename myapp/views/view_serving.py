@@ -99,6 +99,8 @@ class Service_ModelView_base():
         "deploy": {"type": "ellip2", "width": 200},
         "modified": {"type": "ellip2", "width": 150}
     }
+    search_columns = ['created_by','project','name','label','images','resource_memory','resource_cpu','resource_gpu','volume_mount','host']
+
     edit_columns = ['project','name', 'label','images','working_dir','command','env','resource_memory','resource_cpu','resource_gpu','replicas','ports','volume_mount','host',]
     base_order = ('id','desc')
     order_columns = ['id']
@@ -110,7 +112,13 @@ class Service_ModelView_base():
     edit_form_query_rel_fields = add_form_query_rel_fields
 
     add_form_extra_fields={
-        "name":StringField(_(datamodel.obj.lab('name')), description='英文名(字母、数字、- 组成)，最长50个字符',widget=BS3TextFieldWidget(), validators=[DataRequired(),Regexp("^[a-z][a-z0-9\-]*[a-z0-9]$"),Length(1,54)]),
+        "project": QuerySelectField(
+            _(datamodel.obj.lab('project')),
+            query_factory=filter_join_org_project,
+            allow_blank=True,
+            widget=Select2Widget()
+        ),
+        "name":StringField(_(datamodel.obj.lab('name')), description='英文名(小写字母、数字、- 组成)，最长50个字符',widget=BS3TextFieldWidget(), validators=[DataRequired(),Regexp("^[a-z][a-z0-9\-]*[a-z0-9]$"),Length(1,54)]),
         "label":StringField(_(datamodel.obj.lab('label')), description='中文名', widget=BS3TextFieldWidget(),validators=[DataRequired()]),
         "images": StringField(_(datamodel.obj.lab('images')), description='镜像全称', widget=BS3TextFieldWidget(), validators=[DataRequired()]),
         "volume_mount":StringField(_(datamodel.obj.lab('volume_mount')),description='外部挂载，格式:$pvc_name1(pvc):/$container_path1,$hostpath1(hostpath):/$container_path2,4G(memory):/dev/shm,注意pvc会自动挂载对应目录下的个人rtx子目录',widget=BS3TextFieldWidget(),default=''),
@@ -138,7 +146,7 @@ class Service_ModelView_base():
     )
 
     edit_form_extra_fields = add_form_extra_fields
-    # edit_form_extra_fields['name']=StringField(_(datamodel.obj.lab('name')), description='英文名(字母、数字、- 组成)，最长50个字符',widget=MyBS3TextFieldWidget(readonly=True), validators=[Regexp("^[a-z][a-z0-9\-]*[a-z0-9]$"),Length(1,54)]),
+    # edit_form_extra_fields['name']=StringField(_(datamodel.obj.lab('name')), description='英文名(小写字母、数字、- 组成)，最长50个字符',widget=MyBS3TextFieldWidget(readonly=True), validators=[Regexp("^[a-z][a-z0-9\-]*[a-z0-9]$"),Length(1,54)]),
 
 
     def pre_add(self, item):
@@ -270,61 +278,6 @@ class Service_ModelView_base():
                 external_ip=SERVICE_EXTERNAL_IP
             )
 
-        # # 创建虚拟服务做代理
-        # crd_info = conf.get('CRD_INFO', {}).get('virtualservice', {})
-        # crd_name =  "service-%s"%service.name
-        # crd_list = k8s.get_crd(group=crd_info['group'], version=crd_info['version'], plural=crd_info['plural'],namespace=namespace, return_dict=None)
-        # for vs_obj in crd_list:
-        #     if vs_obj['name'] == crd_name:
-        #         k8s.delete_crd(group=crd_info['group'], version=crd_info['version'], plural=crd_info['plural'],namespace=namespace, name=crd_name)
-        #         time.sleep(1)
-        # crd_json = {
-        #     "apiVersion": "networking.istio.io/v1alpha3",
-        #     "kind": "VirtualService",
-        #     "metadata": {
-        #         "name": crd_name,
-        #         "namespace": namespace
-        #     },
-        #     "spec": {
-        #         "gateways": [
-        #             "kubeflow/kubeflow-gateway"
-        #         ],
-        #         "hosts": [
-        #             "*"
-        #         ],
-        #         "http": [
-        #             {
-        #                 "match": [
-        #                     {
-        #                         "uri": {
-        #                             "prefix": "/service/%s/"%service.name
-        #                         }
-        #                     }
-        #                 ],
-        #                 "rewrite": {
-        #                     "uri": "/"
-        #                 },
-        #                 "route": [
-        #                     {
-        #                         "destination": {
-        #                             "host": "%s.service.svc.cluster.local"%service.name,
-        #                             "port": {
-        #                                 "number": int(service.ports.split(',')[0])
-        #                             }
-        #                         }
-        #                     }
-        #                 ],
-        #                 "timeout": "300s"
-        #             }
-        #         ]
-        #     }
-        # }
-        #
-        # # print(crd_json)
-        # crd = k8s.create_crd(group=crd_info['group'], version=crd_info['version'], plural=crd_info['plural'],namespace=namespace, body=crd_json)
-        # # return crd
-
-
         flash('服务部署完成',category='success')
         return redirect(conf.get("MODEL_URLS",{}).get("service",'/'))
 
@@ -336,7 +289,7 @@ class Service_ModelView_base():
 class Service_ModelView(Service_ModelView_base,MyappModelView,DeleteMixin):
     datamodel = SQLAInterface(Service)
 
-appbuilder.add_view(Service_ModelView,"内部服务",icon = 'fa-internet-explorer',category = '服务化')
+appbuilder.add_view_no_menu(Service_ModelView)
 
 
 class Service_ModelView_Api(Service_ModelView_base,MyappModelRestApi):

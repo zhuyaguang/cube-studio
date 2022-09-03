@@ -117,7 +117,7 @@ class Notebook_ModelView_Base():
         self.add_form_extra_fields['name'] = StringField(
             _(self.datamodel.obj.lab('name')),
             default="%s-"%g.user.username+uuid.uuid4().hex[:4],
-            description='英文名(字母、数字、-组成)，最长50个字符',
+            description='英文名(小写字母、数字、-组成)，最长50个字符',
             widget=MyBS3TextFieldWidget(readonly=True if notebook else False),
             validators=[DataRequired(),Regexp("^[a-z][a-z0-9\-]*[a-z0-9]$"),Length(1,54)]   # 注意不能以-开头和结尾
         )
@@ -267,7 +267,7 @@ class Notebook_ModelView_Base():
         db.session.commit()
 
     def post_list(self,items):
-        flash('注意：notebook会定时清理，如要运行长期任务请在pipeline中创建任务流进行。个人持久化目录在/mnt/%s/下'%g.user.username,category='warning')
+        flash('注意：notebook会定时清理，如要运行长期任务请在pipeline中创建任务流进行。<br>个人持久化目录在/mnt/%s/下'%g.user.username,category='warning')
         # items.sort(key=lambda item:item.created_by.username==g.user.username,reverse=True)
         return items
 
@@ -315,8 +315,6 @@ class Notebook_ModelView_Base():
         command=None
         workingDir=None
         volume_mount = notebook.volume_mount
-        if '/dev/shm' not in volume_mount:
-            volume_mount += ',10G(memory):/dev/shm'
         rewrite_url = '/'
         pre_command = '(nohup sh /init.sh > /notebook_init.log 2>&1 &) ; (nohup sh /mnt/%s/init.sh > /init.log 2>&1 &) ; '%notebook.created_by.username
         if notebook.ide_type=='jupyter':
@@ -442,10 +440,10 @@ class Notebook_ModelView_Base():
         # print(crd_json)
         crd = k8s_client.create_crd(group=crd_info['group'], version=crd_info['version'], plural=crd_info['plural'],namespace=namespace, body=crd_json)
 
-        # 创建EXTERNAL_IP的服务
-        SERVICE_EXTERNAL_IP = conf.get('SERVICE_EXTERNAL_IP', None)
-        if not SERVICE_EXTERNAL_IP and notebook.project.expand:
-            SERVICE_EXTERNAL_IP = json.loads(notebook.project.expand).get('SERVICE_EXTERNAL_IP', SERVICE_EXTERNAL_IP)
+        # 边缘模式时，需要根据项目组中的配置设置代理ip
+        SERVICE_EXTERNAL_IP = ''
+        if notebook.project.expand:
+            SERVICE_EXTERNAL_IP = json.loads(notebook.project.expand).get('SERVICE_EXTERNAL_IP', '')
             if type(SERVICE_EXTERNAL_IP)==str:
                 SERVICE_EXTERNAL_IP = [SERVICE_EXTERNAL_IP]
 
@@ -551,7 +549,7 @@ class Notebook_ModelView_Base():
 class Notebook_ModelView(Notebook_ModelView_Base,MyappModelView,DeleteMixin):
     datamodel = SQLAInterface(Notebook)
 # 添加视图和菜单
-appbuilder.add_view(Notebook_ModelView,"notebook",href="/notebook_modelview/list/?_flt_0_created_by=",icon = 'fa-file-code-o',category = '在线开发',category_icon = 'fa-code')
+appbuilder.add_view_no_menu(Notebook_ModelView)
 
 
 # 添加api

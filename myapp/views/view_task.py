@@ -133,7 +133,7 @@ class Task_ModelView_Base():
 
         "name":StringField(
             label=_(datamodel.obj.lab('name')),
-            description='英文名(字母、数字、- 组成)，最长50个字符',
+            description='英文名(小写字母、数字、- 组成)，最长50个字符',
             widget=BS3TextFieldWidget(),
             validators=[Regexp("^[a-z][a-z0-9\-]*[a-z0-9]$"), Length(1, 54),DataRequired()]
         ),
@@ -485,6 +485,10 @@ class Task_ModelView_Base():
         for global_env_key in platform_global_envs:
             if global_env_key not in task_env:
                 task_env += global_env_key + '=' + platform_global_envs[global_env_key] + "\n"
+        new_args=[]
+        if args:
+            for arg in args:
+                new_args.append(template_str(arg))
 
         volume_mount = task.volume_mount
 
@@ -498,7 +502,7 @@ class Task_ModelView_Base():
                              name=pod_name,
                              labels={"pipeline": task.pipeline.name, 'task': task.name, 'user': g.user.username,'run-id': run_id,'pod-type':"task"},
                              command=command,
-                             args=args,
+                             args=new_args,
                              volume_mount=volume_mount,
                              working_dir=working_dir,
                              node_selector=task.get_node_selector(), resource_memory=resource_memory,
@@ -556,18 +560,24 @@ class Task_ModelView_Base():
             )
 
         try_num=30
+        message = '启动时间过长，一分钟后刷新此页面'
         while(try_num>0):
             pod = k8s_client.get_pods(namespace=namespace, pod_name=pod_name)
             # print(pod)
             if pod:
                 pod = pod[0]
             # 有历史非运行态，直接删除
-            if pod and pod['status'] == 'Running':
-                break
+            if pod:
+                if pod['status'] == 'Running':
+                    break
+                else:
+                    try:
+                        message = '启动时间过长，一分钟后刷新此页面'+", status:"+pod['status']+", message:"+json.dumps(pod['status_more']['conditions'],indent=4,ensure_ascii=False)
+                    except Exception as e:
+                        print(e)
             try_num=try_num-1
             time.sleep(2)
         if try_num==0:
-            message='启动时间过长，一分钟后重试'
             flash(message,'warning')
             return self.response(400, **{"status": 1, "result": {}, "message": message})
             # return redirect('/pipeline_modelview/web/%s'%str(task.pipeline.id))
@@ -751,6 +761,7 @@ class Task_ModelView_Api(Task_ModelView_Base,MyappModelRestApi):
     datamodel = SQLAInterface(Task)
     route_base = '/task_modelview/api'
     # list_columns = ['name','label','job_template_url','volume_mount','debug']
+    list_columns =['name', 'label','pipeline', 'job_template','volume_mount','node_selector','command','overwrite_entrypoint','working_dir', 'args','resource_memory','resource_cpu','resource_gpu','timeout','retry','created_by','changed_by','created_on','changed_on','monitoring','expand']
     add_columns = ['name','label','job_template','pipeline','working_dir','command','args','volume_mount','node_selector','resource_memory','resource_cpu','resource_gpu','timeout','retry','expand']
     edit_columns = add_columns
     show_columns = ['name', 'label','pipeline', 'job_template','volume_mount','node_selector','command','overwrite_entrypoint','working_dir', 'args','resource_memory','resource_cpu','resource_gpu','timeout','retry','created_by','changed_by','created_on','changed_on','monitoring','expand']
