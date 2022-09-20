@@ -14,7 +14,7 @@ search_latency_fmt = "search latency = {:.4f}s"
 
 app = FastAPI()
 #TODO 命令行输入device
-device = 'cuda:0'
+device = 'cpu'
 
 class Net(nn.Module):
     """ Network architecture. """
