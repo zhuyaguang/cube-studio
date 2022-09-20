@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:1.12.1-cuda11.4-cudnn8-runtime
+FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-runtime
 
 
 RUN python3 -m pip install uvicorn -i https://pypi.tuna.tsinghua.edu.cn/simple
